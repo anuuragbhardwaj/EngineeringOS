@@ -1,0 +1,27 @@
+# Agent registry — configuration-driven employee resolution for Runtime v1
+# Maps agent IDs to prompts and orchestration metadata (no hardcoded routing in code)
+
+version: "1.0.0"
+orchestrator: engineering-manager
+
+agents:
+  engineering-manager:
+    role: Engineering Manager
+    prompt_path: .cursor/agents/engineering-manager.md
+    orchestrator: true
+  senior-product-manager:
+    role: Senior Product Manager
+    prompt_path: .cursor/agents/senior-product-manager.md
+  senior-business-analyst:
+    role: Senior Business Analyst
+    prompt_path: .cursor/agents/senior-business-analyst.md
+  senior-software-planner:
+    role: Senior Software Planner
+    prompt_path: .cursor/agents/senior-software-planner.md
+    required_capabilities:
+      - structured-reasoning
+  senior-software-architect:
+    role: Senior Software Architect
+    prompt_path: .cursor/agents/senior-software-architect.md
+    required_capabilities:
+      - documentation-lookup

@@ -1,0 +1,10 @@
+"""Execution platform events."""
+
+ExecutionRequested = "ExecutionRequested"
+ExecutionStarted = "ExecutionStarted"
+ExecutionCompleted = "ExecutionCompleted"
+ExecutionFailed = "ExecutionFailed"
+ProviderSelected = "ProviderSelected"
+ProviderFallback = "ProviderFallback"
+ConversationCreated = "ConversationCreated"
+RetryAttempted = "RetryAttempted"

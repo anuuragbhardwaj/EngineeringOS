@@ -19,6 +19,7 @@ The AI Company Framework provides a complete **11-phase SDLC**, ten specialist *
 | Read framework constitution | [docs/framework/framework-architecture.md](./docs/framework/framework-architecture.md) |
 | Documentation standards | [handbook/documentation-standards.md](./handbook/documentation-standards.md) |
 | Validate MCP setup | `python -m mcp_platform validate` |
+| Use EngineeringOS CLI | `engineeringos --help` — see [docs/cli/README.md](./docs/cli/README.md) |
 
 ---
 
@@ -29,6 +30,14 @@ ai-company/
 ├── handbook/              # Company standards and policies
 ├── mcp/                   # MCP Platform (registry, capabilities, policies)
 ├── mcp_platform/          # MCP validation tooling
+├── packages/
+│   ├── company_core/      # Framework API (manifest, models)
+│   ├── company_cli/       # EngineeringOS CLI (engineeringos)
+│   ├── runtime_engine/    # Company Kernel (Runtime v1)
+│   ├── ai_execution/      # AI Execution Platform (provider boundary)
+│   └── orchestrator/      # Operational intelligence layer
+├── tests/                 # CLI and Framework API tests
+├── company.yaml           # Dev company instance manifest
 ├── .cursor/agents/        # Employee agent prompts (Cursor adapter)
 ├── workflow.yaml          # Machine-readable SDLc
 ├── workflow-v1.md         # Human-readable SDLc
@@ -83,7 +92,26 @@ See [mcp/selection-policy.md](./mcp/selection-policy.md).
 
 ### Company Kernel
 
-Public runtime contracts in [runtime/interfaces.md](./runtime/interfaces.md). Implementation (`runtime_engine`) is planned — contracts are frozen.
+Public runtime contracts in [runtime/interfaces.md](./runtime/interfaces.md). **Runtime v1** (`runtime_engine`) executes the planning pipeline (Idea → Architecture).
+
+```bash
+engineeringos project create --yes --name "My App" --location ./projects/my-app
+engineeringos project status my-app
+```
+
+See [packages/runtime_engine/README.md](./packages/runtime_engine/README.md).
+
+### AI Execution Platform
+
+All AI provider communication flows through `ai_execution` — Runtime never calls Cursor or any provider directly.
+
+See [packages/ai_execution/README.md](./packages/ai_execution/README.md) and [docs/ai-execution/README.md](./docs/ai-execution/README.md).
+
+### Orchestrator
+
+Sequences employees, assembles context, builds prompts, and routes conversations. Runtime delegates all orchestration intelligence here.
+
+See [packages/orchestrator/README.md](./packages/orchestrator/README.md) and [docs/orchestrator/README.md](./docs/orchestrator/README.md).
 
 ### Framework API
 
@@ -110,9 +138,22 @@ See [docs/framework/domain-model.md](./docs/framework/domain-model.md) for 20 de
 cd ai-company
 python -m venv .venv
 .venv\Scripts\activate        # Windows
-pip install pyyaml            # for mcp_platform
+pip install -e ".[dev]"
+engineeringos version
 python -m mcp_platform validate
 ```
+
+### EngineeringOS CLI
+
+```bash
+engineeringos --help
+engineeringos init ./my-instance --id my-company
+engineeringos doctor
+engineeringos validate
+engineeringos mcp list
+```
+
+Full command reference: [docs/cli/README.md](./docs/cli/README.md).
 
 Enable **sequential-thinking** MCP in Cursor (see [mcp/installation-guide.md](./mcp/installation-guide.md)).
 

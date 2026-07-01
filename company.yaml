@@ -1,0 +1,23 @@
+company:
+  instance_id: ai-company-dev
+  instance_version: "1.0.0"
+  schema_version: "1.0.0"
+  framework:
+    version: "2.0.0"
+    install_path: .
+  employees:
+    directory: employees/
+  policies:
+    handbook: handbook/
+  templates:
+    directory: templates/
+    version: "2.0.0"
+  standards:
+    workflow: workflow.yaml
+  manifest: company.yaml
+  mcp_profiles:
+    default: mcp.json
+  configuration:
+    workspaces_root: workspaces/
+    default_workspace: default
+  workspaces: []

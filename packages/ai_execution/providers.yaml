@@ -1,0 +1,72 @@
+# AI Execution Platform — provider registry configuration
+version: "1.0.0"
+default_provider: cursor
+fallback_provider: scaffold
+
+providers:
+  cursor:
+    enabled: true
+    priority: 100
+    capabilities:
+      - reasoning
+      - planning
+      - implementation
+      - review
+      - documentation
+      - vision
+      - tool-use
+      - long-context
+      - coding
+  scaffold:
+    enabled: true
+    priority: 0
+    capabilities:
+      - reasoning
+      - planning
+      - documentation
+      - coding
+  claude-code:
+    enabled: false
+    placeholder: true
+    priority: 90
+    capabilities:
+      - reasoning
+      - planning
+      - coding
+      - tool-use
+  openai:
+    enabled: false
+    placeholder: true
+    priority: 80
+    capabilities:
+      - reasoning
+      - coding
+      - long-context
+  gemini:
+    enabled: false
+    placeholder: true
+    priority: 80
+    capabilities:
+      - reasoning
+      - vision
+      - long-context
+  opencode:
+    enabled: false
+    placeholder: true
+    priority: 70
+    capabilities:
+      - coding
+      - tool-use
+  roo-code:
+    enabled: false
+    placeholder: true
+    priority: 70
+    capabilities:
+      - coding
+      - implementation
+  local:
+    enabled: false
+    placeholder: true
+    priority: 10
+    capabilities:
+      - coding

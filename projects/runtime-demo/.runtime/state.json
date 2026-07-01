@@ -1,0 +1,228 @@
+{
+  "schema_version": "1.0.0",
+  "project_id": "runtime-demo",
+  "status": "active",
+  "artifact_root": "C:\\Ai-Lab\\ai-company\\projects\\runtime-demo",
+  "workflow_version": "1.1",
+  "workflow_path": "C:\\Ai-Lab\\ai-company\\workflow.yaml",
+  "created_at": "2026-07-01T19:55:31.477348",
+  "updated_at": "2026-07-01T19:55:31.862277",
+  "metadata": {
+    "name": "Runtime Demo",
+    "description": "E2E runtime test",
+    "platform": "cross-platform",
+    "mode": "production",
+    "technology_stack": "Python"
+  },
+  "current_phase_id": "architecture",
+  "phase_status": {
+    "idea": "pass",
+    "requirements": "pass",
+    "specification": "pass",
+    "planning": "pass",
+    "architecture": "pass",
+    "implementation": "pending",
+    "testing": "pending",
+    "review": "pending",
+    "documentation": "pending",
+    "release": "pending",
+    "closure": "pending"
+  },
+  "skip_risk_accepted": {},
+  "gate_strikes": {
+    "G0": 0,
+    "G1": 0,
+    "G2": 0,
+    "G3": 0,
+    "G4": 0
+  },
+  "artifact_index": {
+    "idea.md": {
+      "name": "idea.md",
+      "path": "idea.md",
+      "owner_agent": "engineering-manager",
+      "last_validated_at": null,
+      "validation_status": null,
+      "version": null,
+      "approved": false
+    },
+    "pipeline-status.md": {
+      "name": "pipeline-status.md",
+      "path": "pipeline-status.md",
+      "owner_agent": "engineering-manager",
+      "last_validated_at": null,
+      "validation_status": null,
+      "version": null,
+      "approved": false
+    },
+    "requirements.md": {
+      "name": "requirements.md",
+      "path": "requirements.md",
+      "owner_agent": "senior-product-manager",
+      "last_validated_at": null,
+      "validation_status": null,
+      "version": null,
+      "approved": false
+    },
+    "spec.md": {
+      "name": "spec.md",
+      "path": "spec.md",
+      "owner_agent": "senior-business-analyst",
+      "last_validated_at": null,
+      "validation_status": null,
+      "version": null,
+      "approved": false
+    },
+    "tasks.md": {
+      "name": "tasks.md",
+      "path": "tasks.md",
+      "owner_agent": "senior-software-planner",
+      "last_validated_at": null,
+      "validation_status": null,
+      "version": null,
+      "approved": false
+    },
+    "architecture.md": {
+      "name": "architecture.md",
+      "path": "architecture.md",
+      "owner_agent": "senior-software-architect",
+      "last_validated_at": null,
+      "validation_status": null,
+      "version": null,
+      "approved": false
+    }
+  },
+  "rework_history": [],
+  "gate_history": [
+    {
+      "gate_id": "G0",
+      "phase_id": "idea",
+      "passed": true,
+      "timestamp": "2026-07-01T19:55:31.551308",
+      "notes": "Planning pipeline v1 \u2014 Idea complete",
+      "evaluator": "em",
+      "user_approved": false,
+      "metadata": {}
+    },
+    {
+      "gate_id": "G1",
+      "phase_id": "requirements",
+      "passed": true,
+      "timestamp": "2026-07-01T19:55:31.627538",
+      "notes": "Planning pipeline v1 \u2014 Requirements complete",
+      "evaluator": "em",
+      "user_approved": false,
+      "metadata": {}
+    },
+    {
+      "gate_id": "G2",
+      "phase_id": "specification",
+      "passed": true,
+      "timestamp": "2026-07-01T19:55:31.701336",
+      "notes": "Planning pipeline v1 \u2014 Specification complete",
+      "evaluator": "em",
+      "user_approved": false,
+      "metadata": {}
+    },
+    {
+      "gate_id": "G3",
+      "phase_id": "planning",
+      "passed": true,
+      "timestamp": "2026-07-01T19:55:31.767721",
+      "notes": "Planning pipeline v1 \u2014 Planning complete",
+      "evaluator": "em",
+      "user_approved": false,
+      "metadata": {}
+    },
+    {
+      "gate_id": "G4",
+      "phase_id": "architecture",
+      "passed": true,
+      "timestamp": "2026-07-01T19:55:31.842656",
+      "notes": "Planning pipeline v1 \u2014 Architecture complete",
+      "evaluator": "em",
+      "user_approved": false,
+      "metadata": {}
+    }
+  ],
+  "transition_history": [
+    {
+      "timestamp": "2026-07-01T19:55:31.572358",
+      "from_phase_id": "idea",
+      "to_phase_id": "requirements",
+      "gate_id": "G0",
+      "trigger": "advance"
+    },
+    {
+      "timestamp": "2026-07-01T19:55:31.647928",
+      "from_phase_id": "requirements",
+      "to_phase_id": "specification",
+      "gate_id": "G1",
+      "trigger": "advance"
+    },
+    {
+      "timestamp": "2026-07-01T19:55:31.717799",
+      "from_phase_id": "specification",
+      "to_phase_id": "planning",
+      "gate_id": "G2",
+      "trigger": "advance"
+    },
+    {
+      "timestamp": "2026-07-01T19:55:31.787605",
+      "from_phase_id": "planning",
+      "to_phase_id": "architecture",
+      "gate_id": "G3",
+      "trigger": "advance"
+    }
+  ],
+  "execution": {
+    "parallel_tracks": [],
+    "active_agent_id": "engineering-manager",
+    "last_invocation_at": "2026-07-01T19:55:31.792808",
+    "invocation_count": 5,
+    "history": [
+      {
+        "timestamp": "2026-07-01T19:55:31.507225",
+        "orchestrator": "engineering-manager",
+        "specialist": "engineering-manager",
+        "phase_id": "idea",
+        "artifact": "idea.md",
+        "status": "completed"
+      },
+      {
+        "timestamp": "2026-07-01T19:55:31.577451",
+        "orchestrator": "engineering-manager",
+        "specialist": "senior-product-manager",
+        "phase_id": "requirements",
+        "artifact": "requirements.md",
+        "status": "completed"
+      },
+      {
+        "timestamp": "2026-07-01T19:55:31.657758",
+        "orchestrator": "engineering-manager",
+        "specialist": "senior-business-analyst",
+        "phase_id": "specification",
+        "artifact": "spec.md",
+        "status": "completed"
+      },
+      {
+        "timestamp": "2026-07-01T19:55:31.732274",
+        "orchestrator": "engineering-manager",
+        "specialist": "senior-software-planner",
+        "phase_id": "planning",
+        "artifact": "tasks.md",
+        "status": "completed"
+      },
+      {
+        "timestamp": "2026-07-01T19:55:31.797416",
+        "orchestrator": "engineering-manager",
+        "specialist": "senior-software-architect",
+        "phase_id": "architecture",
+        "artifact": "architecture.md",
+        "status": "completed"
+      }
+    ],
+    "pipeline_completed": true,
+    "pipeline_stop_phase": "architecture"
+  }
+}

@@ -1,0 +1,46 @@
+# EngineeringOS Orchestrator — execution policies
+version: "1.0.0"
+
+defaults:
+  max_retries: 2
+  timeout_seconds: 300
+  sequential: true
+  context_max_chars: 32000
+  approval_required_gates: []
+
+phases:
+  idea:
+    policy: sequential
+    approval_required: false
+  requirements:
+    policy: sequential
+  specification:
+    policy: sequential
+  planning:
+    policy: sequential
+    mcp_evidence_required: true
+  architecture:
+    policy: sequential
+    mcp_evidence_required: true
+  implementation:
+    policy: parallel_ready
+  testing:
+    policy: sequential
+  review:
+    policy: sequential
+  documentation:
+    policy: sequential
+
+policies:
+  sequential:
+    sequential: true
+    max_retries: 2
+    timeout_seconds: 300
+  parallel_ready:
+    sequential: false
+    max_retries: 1
+    timeout_seconds: 600
+  approval_required:
+    sequential: true
+    max_retries: 0
+    approval_required: true
