@@ -70,7 +70,6 @@ class Runtime:
         self._validation = validation_engine
         self._rework = rework_engine
         self._framework_root = framework_root
-        self._validators_extra: list = []
 
     @property
     def workflow(self) -> WorkflowDefinition:
@@ -370,7 +369,6 @@ class Runtime:
 
     def register_validator(self, validator) -> None:
         self._validation.register(validator)
-        self._validators_extra.append(validator)
 
     def register_plugin(self, plugin) -> str:
         raise NotImplementedError("Plugins not implemented in Runtime v1")

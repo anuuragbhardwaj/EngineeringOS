@@ -53,8 +53,9 @@ def _make_knowledge_provider(instance_root: Path):
 
 
 def _discover_framework_root() -> Path:
-    current = Path.cwd().resolve()
-    for directory in [current, *current.parents]:
-        if (directory / "workflow.yaml").is_file():
-            return directory
+    from company_core.config.loader import discover_framework_root_from_path
+
+    root = discover_framework_root_from_path()
+    if root is not None:
+        return root
     return Path(__file__).resolve().parents[4]

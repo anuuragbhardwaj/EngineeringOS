@@ -1,43 +1,47 @@
 # CLI Architecture — AI Company Framework
 
-**Version:** 2.0.0  
+**Version:** 2.0.0 (alignment 2026-07-02)  
 **Date:** 2026-07-01  
-**Status:** Design only — delegates to [framework-api.md](./framework-api.md)
+**Status:** **Implemented** — binary `engineeringos`, delegates to [framework-api.md](./framework-api.md)
 
 ---
 
 ## Purpose
 
-The `company` CLI is a **thin facade** over the Framework API. No SDLc, gate, or validation logic in CLI code.
+The `engineeringos` CLI is a **thin facade** over `FrameworkAPI`. No SDLC, gate, or validation logic in CLI code.
+
+**Entry point:** `company_cli.main:run` → `engineeringos`  
+**API access:** `company_cli.context.get_api()` (cached per process; cleared in tests via `reset_api_cache()`)
 
 ---
 
 ## Command Index
 
-| Command | API | Purpose |
-|---------|-----|---------|
-| `company init` | CompanyAPI | Bootstrap company in directory |
-| `company create` | CompanyAPI | Create named company instance |
-| `company open` | CompanyAPI + WorkspaceAPI | Set active context |
-| `company doctor` | CompanyAPI | Full health check |
-| `company status` | CompanyAPI | Company/workspace/project summary |
-| `company validate` | McpAPI + validators | Run all validations |
-| `company upgrade` | CompanyAPI | Framework version upgrade |
-| `company migrate` | CompanyAPI | Major version migration |
-| `company install` | IntegrationAPI | Sync editor integration |
-| `company uninstall` | IntegrationAPI | Remove editor integration |
-| `company version` | CompanyAPI | Show version info |
-| `company workspace create` | WorkspaceAPI | New workspace |
-| `company workspace list` | WorkspaceAPI | List workspaces |
-| `company project create` | ProjectAPI | New project |
-| `company project list` | ProjectAPI | List projects |
-| `company project archive` | ProjectAPI | Archive project |
-| `company mcp list` | McpAPI | List MCPs/capabilities |
-| `company mcp validate` | McpAPI | Registry validation |
-| `company mcp doctor` | McpAPI | MCP health checks |
-| `company employees` | EmployeeAPI | List employees + phases |
+| Command group | API | Status |
+|---------------|-----|--------|
+| `engineeringos init` | CompanyAPI / lifecycle | Shipped |
+| `engineeringos open` | CompanyAPI | Shipped |
+| `engineeringos doctor` | CompanyAPI + MCP | Shipped |
+| `engineeringos validate` | FrameworkAPI.validate_all | Shipped |
+| `engineeringos status` | Context + lifecycle | Shipped |
+| `engineeringos version` | CompanyAPI | Shipped |
+| `engineeringos upgrade` / `migrate` / `repair` / `uninstall` | lifecycle | Shipped |
+| `engineeringos workspace *` | WorkspaceAPI | Shipped |
+| `engineeringos project *` | ProjectAPI | Shipped |
+| `engineeringos context *` / `current` | ContextAPI | Shipped |
+| `engineeringos continue` / `pause` / `resume` / `history` | Context + Autonomous | Shipped |
+| `engineeringos work` / `stop` / `goals` / `blockers` / `decisions` / `explain` | AutonomousCompanyAPI | Shipped |
+| `engineeringos supervise` / `monitor` / `heartbeat` / `recover` | AutonomousCompanyAPI | Shipped |
+| `engineeringos approvals *` / `autonomy status` | AutonomousCompanyAPI | Shipped |
+| `engineeringos knowledge *` | KnowledgeAPI | Shipped |
+| `engineeringos repo *` | SourceControlAPI | Shipped |
+| `engineeringos parallel *` | ParallelExecutionAPI | Shipped |
+| `engineeringos mcp *` | McpAPI | Shipped |
+| `engineeringos employees` | EmployeeAPI | Stub |
+| `engineeringos config` | — | Planned |
+| `engineeringos company` | CompanyAPI | Shipped (navigation) |
 
-Runtime commands (`gate`, `advance`, `rework`, `release`, `close`) delegate to `IRuntime` when available.
+Full reference: [docs/cli/README.md](../cli/README.md). Discovery test: `tests/test_command_discovery.py`.
 
 ---
 

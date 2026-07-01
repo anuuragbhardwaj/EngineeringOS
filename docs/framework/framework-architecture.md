@@ -41,17 +41,28 @@ Framework (immutable product)
 
 ---
 
-## Design Complete — Implementation Next
+## Implementation Status (2026-07-02)
 
-| Component | Architecture source | Implementation |
-|-----------|--------------------|--------------------|
-| Framework API | framework-api.md | `packages/company_core` |
-| CLI | cli-architecture.md | `packages/company_cli` |
-| Runtime | runtime/interfaces.md | `packages/runtime_engine` |
-| Integrations | integration-architecture.md | `integrations/*` |
-| Plugins | plugin-architecture.md | `packages/plugins/*` |
+| Component | Architecture source | Implementation | Status |
+|-----------|--------------------|--------------------|--------|
+| Framework API | framework-api.md | `packages/company_core` | **Shipped** |
+| CLI | cli-architecture.md | `packages/company_cli` (`engineeringos`) | **Shipped** |
+| Runtime | runtime/interfaces.md | `packages/runtime_engine` | **Shipped** |
+| Orchestrator | Mission spec | `packages/orchestrator` | **Shipped** |
+| AI Execution | Mission spec | `packages/ai_execution` | **Shipped** |
+| Lifecycle | lifecycle.md | `packages/company_lifecycle` | **Shipped** |
+| Workspace Execution | Mission spec | `packages/workspace_execution` | **Shipped** |
+| Knowledge | Mission spec | `packages/knowledge` | **Shipped** |
+| Source Control | Mission spec | `packages/source_control` | **Shipped** |
+| Parallel Execution | Mission spec | `packages/parallel_execution` | **Shipped** |
+| Autonomous Company | Mission spec | `packages/autonomous_company` | **Shipped** |
+| Integrations | integration-architecture.md | `.cursor/agents/` only | **Partial** |
+| Plugins | plugin-architecture.md | `register_plugin` not wired | **Planned** |
+| Documentation Platform | docs/documentation/ | Employee-driven; no package | **Partial** |
 
-**No further architectural redesign required** — future work is implementation projects.
+**Architecture is frozen.** Documentation alignment completed 2026-07-02 — see [docs/alignment/](../alignment/).
+
+**No further architectural redesign required** — future work extends within approved seams.
 
 ---
 

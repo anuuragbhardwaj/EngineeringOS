@@ -3,6 +3,7 @@
 from company_core.config.loader import (
     MANIFEST_FILENAME,
     discover_framework_root,
+    discover_framework_root_from_path,
     discover_instance_root,
     load_manifest,
     manifest_template,
@@ -14,6 +15,7 @@ from company_core.config.loader import (
 __all__ = [
     "MANIFEST_FILENAME",
     "discover_framework_root",
+    "discover_framework_root_from_path",
     "discover_instance_root",
     "load_manifest",
     "manifest_template",

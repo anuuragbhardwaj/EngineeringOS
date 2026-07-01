@@ -81,12 +81,12 @@ EngineeringOS is **releasable as an early production preview** with documented l
 
 No implementation required for **conditional** release — audit outputs only:
 
-- [ ] Publish `docs/audit/*` with release
-- [ ] Update root `README.md` with accurate architecture diagram (Runtime → Orchestrator → AI Execution)
-- [ ] Add **Known Limitations** section to README
-- [ ] Bump or annotate `runtime/interfaces.md` contract version for orchestrator extensions
-- [ ] Update `package-architecture.md` status fields from "Planned" to "Shipped"
-- [ ] Clarify CLI binary name (`engineeringos`)
+- [x] Publish `docs/audit/*` with release — indexed in `docs/README.md`
+- [x] Update root `README.md` with accurate architecture diagram (Runtime → Orchestrator → AI Execution)
+- [x] Add **Known Limitations** section to README
+- [x] Bump or annotate `runtime/interfaces.md` contract version for orchestrator extensions — §1.1 alignment note
+- [x] Update `package-architecture.md` status fields from "Planned" to "Shipped"
+- [x] Clarify CLI binary name (`engineeringos`)
 - [ ] Tag release with scope: `v2.0.0-preview` or similar if not contract-frozen
 
 ---

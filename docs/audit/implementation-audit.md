@@ -12,7 +12,7 @@
 
 EngineeringOS has implemented the **intended three-layer execution stack** (Runtime → Orchestrator → AI Execution Platform) with a **clean CLI → Framework API entry path**. The extraction of orchestration from Runtime into `packages/orchestrator` is structurally correct and aligns with the mission to make Runtime a lifecycle manager.
 
-However, the implementation **outpaced constitutional documentation**. Several frozen documents (`package-architecture.md`, `dependency-map.md`, `framework-api.md`, `runtime/interfaces.md`) describe a pre-orchestrator world. Code introduces packages and dependency edges not reflected in those documents.
+However, constitutional documentation **was updated 2026-07-02** in the documentation alignment project. See [docs/alignment/](../alignment/).
 
 **Verdict:** The implementation is **directionally faithful** to the approved architecture and can support multi-year growth **if** documented boundary violations are acknowledged and remediated as **contract/documentation updates and targeted hardening** — not as a new architectural rewrite.
 
@@ -32,7 +32,7 @@ However, the implementation **outpaced constitutional documentation**. Several f
 2. Traced cross-package imports in production and test code
 3. Compared responsibilities against `runtime/interfaces.md`, `docs/framework/*`, and package READMEs
 4. Evaluated Runtime vs Orchestrator vs AI Execution separation line-by-line
-5. Reviewed test layout (58 tests across 28 files)
+5. Reviewed test layout (**128 tests** across platform suites)
 6. Scored packages and subsystems against frozen design intent
 
 ---
@@ -163,7 +163,7 @@ CLI → Framework API → Runtime (lifecycle)
 
 ### Test architecture
 
-- **58 tests**, all passing (as of audit)
+- **128 tests**, all passing (as of alignment 2026-07-02)
 - Strong coverage: `runtime_engine`, `orchestrator`, `ai_execution`
 - Weak coverage: `mcp_platform` (0 tests), `company_core` API (config only), per-command CLI unit tests
 - Integration tests exercise full stack via `create_runtime()` — good E2E signal
@@ -182,7 +182,7 @@ CLI → Framework API → Runtime (lifecycle)
 
 | ID | Severity | Issue |
 |----|----------|-------|
-| C1 | **Critical** | Constitutional docs contradict live architecture (orchestrator, ai_execution, implemented CLI/core) |
+| C1 | **Critical** | Constitutional docs contradicted live architecture | **Resolved** (2026-07-02 alignment) |
 | C2 | **Critical** | `company_core → runtime_engine` violates documented forbidden dependency |
 | C3 | **High** | Orchestrator mutates `PipelineState` without Runtime-owned mutation port |
 | C4 | **High** | Ephemeral checkpoint/approval state — resume across process unreliable |

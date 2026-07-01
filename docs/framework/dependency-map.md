@@ -1,6 +1,6 @@
 # Dependency Map — AI Company Framework
 
-**Version:** 2.0.0  
+**Version:** 2.0.0 (alignment 2026-07-02)  
 **Date:** 2026-07-01  
 **Parent:** [framework-architecture.md](./framework-architecture.md)
 
@@ -9,17 +9,22 @@
 ## Layer Dependency Rules
 
 ```
-L7  User Space          workspaces/, projects/, user assets
+L7  User Space          workspaces/, projects/, .company/ state
          ▲
-L6  Application          company_cli, SDK, dashboard
+L6  Application          engineeringos CLI, FrameworkAPI
          ▲
-L5  Integrations        cursor, vscode adapters
+L5  Integrations        .cursor/agents/ (Cursor adapter)
          ▲
-L4  Extensions          framework plugins, MCP servers (external)
+L4  Extensions          MCP servers (external), plugins (not wired)
+         ▲
+L3c AI Execution        ai_execution
+         ▲
+L3b Orchestrator        orchestrator, parallel_execution
          ▲
 L3  Runtime Kernel      runtime_engine
          ▲
-L2  Platform Services   mcp/, mcp_platform, validators, templates
+L2  Platform Services   lifecycle, workspace_execution, knowledge,
+                        source_control, autonomous_company, mcp_platform
          ▲
 L1  Domain Core         workflow, handbook, employees
          ▲
@@ -58,18 +63,33 @@ L0  Contracts           company.yaml, runtime/interfaces.md
 ```mermaid
 flowchart BT
     CC[company_core]
+    CL[company_lifecycle]
+    WE[workspace_execution]
+    KN[knowledge]
+    SC[source_control]
+    PE[parallel_execution]
+    AC[autonomous_company]
     MP[mcp_platform]
-    VAL[validators]
     RT[runtime_engine]
+    OR[orchestrator]
+    AI[ai_execution]
     CLI[company_cli]
 
-    MP --> CC
-    VAL --> RT
-    RT --> CC
     CLI --> CC
-    CLI --> MP
-    CLI --> RT
+    CC --> CL
+    CC --> WE
+    CC --> KN
+    CC --> SC
+    CC --> PE
+    CC --> AC
+    CC --> MP
+    CC --> RT
+    RT --> OR
+    OR --> AI
+    OR --> PE
 ```
+
+**Note:** `CC --> RT` is a documented monorepo coupling via `ProjectAPI`.
 
 ---
 
@@ -78,25 +98,36 @@ flowchart BT
 | From | Must NOT import |
 |------|-----------------|
 | `runtime_engine` | cursor, vscode, openai, anthropic, mcp vendors |
-| `company_core` | `runtime_engine`, editors |
-| `mcp_platform` | `runtime_engine` (optional loose coupling only) |
+| `orchestrator` | provider SDKs directly (uses ai_execution) |
+| `ai_execution` | orchestrator internals, CLI |
+| `mcp_platform` | `runtime_engine` |
 | `employees/` content | Any code |
 | `handbook/` | Any code |
 | Kernel plugins | Other plugins' internals |
 | Framework plugins | Kernel engine internals (use events only) |
 
+**Documented exception:** `company_core` imports `runtime_engine` via `ProjectAPI` — violates original L2 purity rule; accepted for monorepo v1. See [technical-debt.md](../audit/technical-debt.md).
+
 ---
 
 ## Data Flow Dependencies
 
-### Project execution
+### Project execution (implemented)
 
 ```
-Workflow (L1) → Runtime (L3) → State (L7)
+Workflow (L1) → Runtime (L3) → Orchestrator (L3b) → AI Execution (L3c)
+                    ↓              ↓
+              StateStore      Parallel Execution (policy-gated)
                     ↓
-              EventBus → Plugins (L4)
-                    ↓
-              AgentAdapter (L4) → Integration (L5)
+              EventBus → Plugins (L4, not wired)
+```
+
+### Autonomous execution (implemented)
+
+```
+CEO goal → Autonomous Company → Supervisor → Workspace Execution resume
+                ↓                                    ↓
+         Decision Engine                      Runtime → Orchestrator
 ```
 
 ### MCP resolution
@@ -108,13 +139,13 @@ Employee (L1) requests Capability
     → MCP Server (L4 external)
 ```
 
-### CLI operation
+### CLI operation (implemented)
 
 ```
-company CLI (L6)
+engineeringos CLI (L6)
+    → FrameworkAPI / company_core (L6)
+    → platform packages (L2) | runtime_engine (L3)
     → company.yaml (L0)
-    → company_core (L2)
-    → runtime_engine (L3) | mcp_platform (L2)
 ```
 
 ---

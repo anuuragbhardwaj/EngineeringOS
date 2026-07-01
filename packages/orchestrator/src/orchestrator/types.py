@@ -4,14 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
 from typing import Any, Callable, Protocol
-
-
-class ExecutionPolicyName(str, Enum):
-    SEQUENTIAL = "sequential"
-    PARALLEL_READY = "parallel_ready"
-    APPROVAL_REQUIRED = "approval_required"
 
 
 @dataclass

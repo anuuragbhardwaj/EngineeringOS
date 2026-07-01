@@ -23,6 +23,18 @@ def discover_instance_root(start: Path | None = None) -> Path | None:
     return None
 
 
+def discover_framework_root_from_path(start: Path | None = None) -> Path | None:
+    """Walk upward from start (or cwd) to find workflow.yaml + runtime/ layout."""
+    current = (start or Path.cwd()).resolve()
+    for directory in [current, *current.parents]:
+        if (directory / "workflow.yaml").is_file() and (directory / "runtime").is_dir():
+            return directory
+    package_root = Path(__file__).resolve().parents[5]
+    if (package_root / "workflow.yaml").is_file() and (package_root / "runtime").is_dir():
+        return package_root
+    return None
+
+
 def discover_framework_root(instance_root: Path | None = None) -> Path | None:
     """Resolve framework install path from manifest or heuristics."""
     if instance_root:
@@ -39,7 +51,11 @@ def discover_framework_root(instance_root: Path | None = None) -> Path | None:
                 if path.is_dir():
                     return path
 
-    # Heuristic: ai-company repo layout (mcp/ + handbook/ at root)
+    from_path = discover_framework_root_from_path(instance_root or Path.cwd())
+    if from_path is not None:
+        return from_path
+
+    # Heuristic: mcp/ + handbook/ at framework root
     for candidate in _framework_candidates(instance_root):
         if (candidate / "mcp" / "registry.yaml").is_file() and (
             candidate / "handbook"

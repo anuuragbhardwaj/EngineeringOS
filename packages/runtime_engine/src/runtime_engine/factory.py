@@ -18,14 +18,12 @@ from runtime_engine.workflow.loader import WorkflowLoader
 
 
 def discover_framework_root(start: Path | None = None) -> Path:
-    current = (start or Path.cwd()).resolve()
-    for directory in [current, *current.parents]:
-        if (directory / "workflow.yaml").is_file() and (directory / "runtime").is_dir():
-            return directory
-    package_root = Path(__file__).resolve().parents[4]
-    if (package_root / "workflow.yaml").is_file():
-        return package_root
-    raise FileNotFoundError("Cannot locate framework root (workflow.yaml)")
+    from company_core.config.loader import discover_framework_root_from_path
+
+    root = discover_framework_root_from_path(start)
+    if root is None:
+        raise FileNotFoundError("Cannot locate framework root (workflow.yaml)")
+    return root
 
 
 def _discover_instance_root_optional() -> Path | None:

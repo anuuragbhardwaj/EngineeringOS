@@ -1,8 +1,8 @@
 # Framework API — AI Company Framework
 
-**Version:** 2.0.0  
+**Version:** 2.0.0 (alignment 2026-07-02)  
 **Date:** 2026-07-01  
-**Status:** Contract specification only — not implemented
+**Status:** **Implemented** — `FrameworkAPI` in `packages/company_core`
 
 **Parent:** [framework-architecture.md](./framework-architecture.md)
 
@@ -12,7 +12,45 @@
 
 The **Framework API** is the **single public interface** through which all products consume the AI Company Framework. No product may bypass it to read framework internals directly.
 
-**Consumers:** CLI, Runtime, Cursor, VS Code, Claude Code, Roo Code, SDK, Cloud, Dashboard, Marketplace, REST API, Language Server.
+**Consumers:** `engineeringos` CLI, future editors, SDK, cloud, dashboard.
+
+---
+
+## Implemented Aggregate (`FrameworkAPI`)
+
+Entry point: `company_core.FrameworkAPI` (`packages/company_core/src/company_core/api/framework.py`).
+
+```python
+from company_core import FrameworkAPI
+
+api = FrameworkAPI()  # discovers company.yaml from cwd
+api.manifest.load()
+api.project.create(...)
+api.autonomous.work("Implement feature X")
+api.knowledge.search("architecture decision")
+api.source_control.status()
+api.parallel_execution.status()
+api.validate_all()
+```
+
+| Property | Status | Delegates to |
+|----------|--------|--------------|
+| `manifest` | Shipped | `company_core` |
+| `company` | Shipped | `company_lifecycle` |
+| `workspace` | Shipped | `company_lifecycle` |
+| `project` | Shipped | `runtime_engine` (via ProjectAPI) |
+| `context` | Shipped | `workspace_execution` |
+| `execution` | Shipped | `workspace_execution` |
+| `mcp` | Shipped | `mcp_platform` |
+| `knowledge` | Shipped | `knowledge` |
+| `source_control` | Shipped | `source_control` |
+| `parallel_execution` | Shipped | `parallel_execution` |
+| `autonomous` | Shipped | `autonomous_company` |
+| `lifecycle` | Shipped | `company_lifecycle` |
+| `employee` | **Stub** | raises `NotImplementedFeatureError` |
+| `integration` | **Stub** | raises `NotImplementedFeatureError` |
+
+**Known coupling:** `ProjectAPI` imports `runtime_engine` directly. Documented in [docs/audit/technical-debt.md](../audit/technical-debt.md). Monorepo v1 accepts this; standalone `company_core` distribution requires composition-root injection (future).
 
 ---
 
@@ -240,13 +278,13 @@ Breaking API change = framework major bump.
 
 | Product | APIs Used |
 |---------|-----------|
-| `company` CLI | All — thin wrapper |
-| Cursor integration | IntegrationAPI, EmployeeAPI, McpAPI |
-| VS Code | IntegrationAPI, EmployeeAPI |
-| SDK | CompanyAPI, WorkspaceAPI, ProjectAPI, RuntimeAPI |
-| Cloud | CompanyAPI, ProjectAPI, EventAPI |
-| Dashboard | EventAPI, CompanyAPI |
-| Marketplace | PluginAPI |
+| `engineeringos` CLI | All shipped APIs — thin Typer wrapper |
+| Cursor integration | Partial — `.cursor/agents/`; IntegrationAPI stub |
+| VS Code | Planned — IntegrationAPI |
+| SDK | Planned — CompanyAPI, WorkspaceAPI, ProjectAPI |
+| Cloud | Planned — CompanyAPI, ProjectAPI, EventAPI |
+| Dashboard | Planned — EventAPI, CompanyAPI |
+| Marketplace | Planned — PluginAPI |
 
 ---
 

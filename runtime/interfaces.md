@@ -43,6 +43,25 @@ This document defines the **public contracts** for the Company Kernel — the op
 
 **Out of scope:** Python module layout, class implementations, vendor SDK types, Cursor-specific behavior.
 
+### 1.1 Implementation Alignment (2026-07-02)
+
+This contract remains **frozen at v1.0.0**. The live implementation adds approved layers and facade methods documented here for transparency — not as contract changes.
+
+| Extension | Location | Notes |
+|-----------|----------|-------|
+| **Orchestrator layer** | `packages/orchestrator` | Sequences employees; sole live `adapter.invoke()` path |
+| **AI Execution layer** | `packages/ai_execution` | Provider boundary below Orchestrator |
+| `execute_planning_pipeline` | `IRuntime` facade | Delegates to Orchestrator |
+| `pause` / `resume` / `history` | `IRuntime` facade | Lifecycle extensions |
+| `ProjectStatus.PAUSED` | `runtime_engine.types` | Beyond §5 enum — used by pause model |
+| `register_plugin` | `IRuntime` facade | Raises `NotImplementedError` |
+| Platform packages | L2 services | lifecycle, workspace_execution, knowledge, source_control, parallel_execution, autonomous_company — consumed via Framework API, not kernel |
+
+**Execution flow (implemented):** Runtime → Orchestrator → AI Execution → Employees.
+
+**Compliance matrix:** [docs/audit/architecture-compliance.md](../docs/audit/architecture-compliance.md).  
+**Recommended:** Minor contract bump (v1.1) to formalize orchestrator layer in §3 — documentation only.
+
 ---
 
 ## 2. Design Principles

@@ -14,14 +14,12 @@ from ai_execution.registry.provider_registry import ProviderRegistry
 
 
 def discover_framework_root(start: Path | None = None) -> Path:
-    current = (start or Path.cwd()).resolve()
-    for directory in [current, *current.parents]:
-        if (directory / "workflow.yaml").is_file() and (directory / "runtime").is_dir():
-            return directory
-    package_root = Path(__file__).resolve().parents[3]
-    if (package_root / "workflow.yaml").is_file():
-        return package_root
-    raise FileNotFoundError("Cannot locate framework root")
+    from company_core.config.loader import discover_framework_root_from_path
+
+    root = discover_framework_root_from_path(start)
+    if root is None:
+        raise FileNotFoundError("Cannot locate framework root")
+    return root
 
 
 def create_platform(

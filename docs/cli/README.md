@@ -1,98 +1,159 @@
 # EngineeringOS CLI
 
-Command-line interface for the AI Company Framework.
+Command-line interface for EngineeringOS. Binary: **`engineeringos`**.
 
 ## Installation
 
-From the `ai-company` repository root:
-
 ```bash
-python -m venv .venv
-.venv\Scripts\activate          # Windows
-# source .venv/bin/activate     # macOS/Linux
+cd engineeringos
 pip install -e ".[dev]"
-```
-
-Verify:
-
-```bash
 engineeringos --help
 engineeringos version
 ```
 
-## Overview
+## Architecture
 
-EngineeringOS (`engineeringos`) is the **primary operator interface** for the framework. It is a thin Typer facade over the [Framework API](../framework/framework-api.md) — no SDLc logic lives in CLI code.
+Thin Typer facade over [Framework API](../framework/framework-api.md). All commands use `company_cli.context.get_api()` — no SDLc logic in CLI code.
 
-| Layer | Package | Role |
-|-------|---------|------|
-| CLI | `company_cli` | Commands, help, exit codes |
-| Framework API | `company_core` | Manifest, company, MCP APIs |
-| MCP Platform | `mcp_platform` | Registry validation |
+| Layer | Package |
+|-------|---------|
+| CLI | `company_cli` |
+| Framework API | `company_core` |
+| Platforms | lifecycle, workspace_execution, knowledge, source_control, parallel_execution, autonomous_company |
+| Kernel stack | runtime_engine → orchestrator → ai_execution |
+
+See [cli-architecture.md](../framework/cli-architecture.md).
+
+---
 
 ## Command Reference
 
+### Company & lifecycle
+
 | Command | Status | Description |
 |---------|--------|-------------|
-| `engineeringos --help` | Shipped | Show all commands |
-| `engineeringos version` | Shipped | Framework, API, CLI versions |
-| `engineeringos doctor` | Shipped | Health checks (manifest, MCP) |
-| `engineeringos validate` | Shipped | Full validation suite |
-| `engineeringos init [PATH]` | Shipped | Bootstrap `company.yaml` |
-| `engineeringos status [--json]` | Partial | Instance summary |
-| `engineeringos open` | Planned | Set active context |
-| `engineeringos config` | Planned | User configuration |
-| `engineeringos workspace create <id>` | Planned | Create workspace |
-| `engineeringos workspace list` | Planned | List workspaces |
-| `engineeringos project create` | Shipped | Create project + run planning pipeline |
-| `engineeringos project status` | Shipped | Pipeline status |
-| `engineeringos project resume` | Shipped | Resume interrupted pipeline |
-| `engineeringos project history` | Shipped | Transition and gate history |
-| `engineeringos project validate` | Shipped | Validate phase artifacts |
-| `engineeringos project list` | Shipped | List projects with runtime state |
-| `engineeringos employees [--phase]` | Planned | List employees |
-| `engineeringos mcp list` | Shipped | List MCP registry |
-| `engineeringos mcp validate` | Shipped | MCP validation |
-| `engineeringos mcp doctor` | Shipped | MCP health checks |
+| `init [PATH]` | Shipped | Bootstrap `company.yaml` |
+| `open` | Shipped | Set active company context |
+| `doctor` | Shipped | Health checks |
+| `validate` | Shipped | Full validation suite |
+| `status [--json]` | Shipped | Instance summary |
+| `version` | Shipped | Framework, API, CLI versions |
+| `upgrade` | Shipped | Framework upgrade planner |
+| `migrate` | Shipped | Migration planner |
+| `repair` | Shipped | Instance repair |
+| `uninstall` | Shipped | Remove instance artifacts |
+| `company` | Shipped | Company navigation |
+| `config` | Planned | User configuration |
 
-## Usage Examples
+### Workspace & project
 
-### Initialize a company instance
+| Command | Status | Description |
+|---------|--------|-------------|
+| `workspace create/list/use/current/...` | Shipped | Workspace management |
+| `project create/list/status/resume/history/validate/...` | Shipped | Project SDLC |
+| `context show/reset/...` | Shipped | Execution context |
+| `current` | Shipped | Active workspace/project |
+
+### Execution
+
+| Command | Status | Description |
+|---------|--------|-------------|
+| `continue [--autonomous/--manual]` | Shipped | Continue pipeline (default: autonomous) |
+| `pause` | Shipped | Pause execution |
+| `resume` | Shipped | Resume execution |
+| `history` | Shipped | Execution history |
+
+### Autonomous company
+
+| Command | Status | Description |
+|---------|--------|-------------|
+| `work <goal>` | Shipped | Start goal-based execution |
+| `stop` | Shipped | Stop autonomous runner |
+| `goals` | Shipped | List goals |
+| `blockers` | Shipped | Active blockers |
+| `decisions` | Shipped | Decision history |
+| `explain` | Shipped | State + latest decision |
+| `supervise` | Shipped | One supervision cycle |
+| `monitor` | Shipped | Monitor snapshot |
+| `heartbeat` | Shipped | Runner heartbeat |
+| `recover` | Shipped | Session recovery |
+| `approvals list/approve` | Shipped | EM approval gates |
+| `autonomy status` | Shipped | Autonomous status |
+
+SDLC completion: `api.autonomous.complete_sdlc()` (API; no dedicated CLI command yet).
+
+### Knowledge
+
+| Command | Status | Description |
+|---------|--------|-------------|
+| `knowledge search/store/promote/history/...` | Shipped | Knowledge platform |
+
+See [docs/knowledge/cli.md](../knowledge/cli.md).
+
+### Source control
+
+| Command | Status | Description |
+|---------|--------|-------------|
+| `repo status/diff/stage/commit/push/release/...` | Shipped | Source control platform |
+
+See [docs/source-control/cli.md](../source-control/cli.md).
+
+### Parallel execution
+
+| Command | Status | Description |
+|---------|--------|-------------|
+| `parallel status/plan/execute/pause/resume/...` | Shipped | Parallel execution engine |
+
+See [docs/parallel-execution/cli.md](../parallel-execution/cli.md).
+
+### MCP
+
+| Command | Status | Description |
+|---------|--------|-------------|
+| `mcp list` | Shipped | Registry listing |
+| `mcp validate` | Shipped | Validation |
+| `mcp doctor` | Shipped | Health checks |
+
+### Employees
+
+| Command | Status | Description |
+|---------|--------|-------------|
+| `employees [--phase]` | Stub | EmployeeAPI not implemented |
+
+---
+
+## Examples
 
 ```bash
-mkdir ~/my-company && cd ~/my-company
-engineeringos init --id acme-engineering
-engineeringos doctor
+engineeringos init ./my-co --id acme --yes
+engineeringos open
+engineeringos workspace create dev
+engineeringos project create my-app --yes
+engineeringos project status my-app
+
+engineeringos work "Implement user authentication"
+engineeringos continue
+engineeringos approvals approve commit
+
+engineeringos knowledge search "architecture"
+engineeringos repo status
+engineeringos parallel status
 ```
 
-### Validate MCP registry (from framework root)
-
-```bash
-cd ai-company
-engineeringos validate
-engineeringos mcp list
-```
-
-### Check versions
-
-```bash
-engineeringos version
-engineeringos --version
-```
-
-## Configuration
-
-The CLI loads configuration from `company.yaml` in the current directory or any parent. See [company-instance-model.md](../framework/company-instance-model.md).
-
-Future releases will support user-level and workspace-level configuration via `engineeringos config`.
-
-## Architecture
-
-- [cli-architecture.md](../framework/cli-architecture.md) — command index
-- [package-architecture.md](../framework/package-architecture.md) — `packages/company_cli`, `packages/company_core`
+---
 
 ## Testing
 
 ```bash
-pytest tests/ -q
+pytest tests/ -q    # 128 tests
 ```
+
+CLI discovery: `tests/test_command_discovery.py`.
+
+---
+
+## References
+
+- [framework-api.md](../framework/framework-api.md)
+- [docs/autonomous-company/cli.md](../autonomous-company/cli.md)
+- [Known limitations](../../README.md#known-limitations)

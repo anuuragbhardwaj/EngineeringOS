@@ -1,9 +1,11 @@
-# AI Company Framework
+# EngineeringOS
 
-**Version:** 2.0.0 (constitutional architecture complete)  
-**Type:** Installable, versioned AI Engineering Framework
+**Version:** 2.0.0  
+**Type:** Installable AI Engineering Framework and runtime
 
-The AI Company Framework provides a complete **11-phase SDLC**, ten specialist **employees** (AI agents), quality **gates**, **handbook** standards, **MCP Platform** tool governance, and **Company Kernel** runtime contracts — editor-independent by design.
+EngineeringOS is an editor-independent framework for running an 11-phase software delivery lifecycle with specialist AI employees, quality gates, MCP tool governance, and a composable execution stack.
+
+This README describes **what is implemented today**, what is partial, and what remains planned. It does not overstate capabilities.
 
 ---
 
@@ -11,193 +13,262 @@ The AI Company Framework provides a complete **11-phase SDLC**, ten specialist *
 
 | I want to… | Go to |
 |------------|-------|
+| Install and run the CLI | [Development Setup](#development-setup) |
 | Understand the delivery pipeline | [handbook/company-handbook.md](./handbook/company-handbook.md) |
-| See SDLc phases and gates | [workflow-v1.md](./workflow-v1.md) |
-| Find employee roles | [.cursor/agents/](./.cursor/agents/) |
-| Use MCP tools | [mcp/employee-matrix.md](./mcp/employee-matrix.md) |
-| Read kernel API contracts | [runtime/interfaces.md](./runtime/interfaces.md) |
-| Read framework constitution | [docs/framework/framework-architecture.md](./docs/framework/framework-architecture.md) |
-| Documentation standards | [handbook/documentation-standards.md](./handbook/documentation-standards.md) |
-| Validate MCP setup | `python -m mcp_platform validate` |
-| Use EngineeringOS CLI | `engineeringos --help` — see [docs/cli/README.md](./docs/cli/README.md) |
+| See SDLC phases and gates | [workflow-v1.md](./workflow-v1.md) |
+| Read Framework API contracts | [docs/framework/framework-api.md](./docs/framework/framework-api.md) |
+| Read kernel contracts | [runtime/interfaces.md](./runtime/interfaces.md) |
+| Full CLI reference | [docs/cli/README.md](./docs/cli/README.md) |
+| Architecture self-audit | [docs/audit/](./docs/audit/) |
+| Documentation alignment (2026-07-02) | [docs/alignment/](./docs/alignment/) |
+
+```bash
+pip install -e ".[dev]"
+engineeringos --help
+engineeringos doctor
+pytest tests/ -q    # 134 tests
+```
+
+---
+
+## Implementation Status
+
+### Implemented
+
+| Component | Package / location | Notes |
+|-----------|-------------------|-------|
+| **11-phase SDLC** | `workflow.yaml`, `handbook/` | Content authority; machine-readable workflow |
+| **Runtime** | `packages/runtime_engine` | Lifecycle, gates, state, validation, events |
+| **Orchestrator** | `packages/orchestrator` | Sequencing, context, prompts, policies |
+| **AI Execution Platform** | `packages/ai_execution` | Provider boundary; scaffold + cursor providers |
+| **Framework API** | `packages/company_core` | `FrameworkAPI` aggregate — single consumption path |
+| **EngineeringOS CLI** | `packages/company_cli` | Binary: `engineeringos` |
+| **Installation & Lifecycle** | `packages/company_lifecycle` | init, workspaces, projects, templates, upgrade |
+| **Workspace Execution** | `packages/workspace_execution` | Session, context, resume, history |
+| **Knowledge Platform** | `packages/knowledge` | Store, retrieval, promotion, git hooks |
+| **Source Control Platform** | `packages/source_control` | Git provider, EM-approved commit/push |
+| **Parallel Execution Engine** | `packages/parallel_execution` | Dependency graphs, workers, orchestrator hook |
+| **Autonomous Company Platform** | `packages/autonomous_company` | Goals, decisions, blockers, SDLC completion |
+| **MCP Platform** | `mcp_platform/` | Registry validation and resolution |
+| **Employees** | `.cursor/agents/` | 10 specialist agent prompts |
+| **Automated tests** | `tests/` | 134 tests |
+
+### Partially Implemented
+
+| Component | Gap |
+|-----------|-----|
+| **EmployeeAPI / IntegrationAPI** | Framework API stubs — raise `NotImplementedFeatureError` |
+| **CursorProvider** | Loads prompts and scaffolds artifacts; does not call live Cursor AI APIs |
+| **Placeholder AI providers** | claude, openai, gemini, etc. — registered but not production-ready |
+| **Plugin system** | `register_plugin` raises `NotImplementedError` |
+| **Documentation Platform** | Spec in `docs/documentation/`; driven by Documentation Engineer employee — no Python package |
+| **Editor integrations** | `.cursor/agents/` adapter only; no VS Code / Claude Code / Roo Code sync CLI |
+| **Orchestrator checkpoints** | In-memory; not fully persisted across process restarts |
+| **`company_core` purity** | `ProjectAPI` imports `runtime_engine` — documented monorepo coupling |
+
+### Planned
+
+| Component | Reference |
+|-----------|-----------|
+| VS Code, Claude Code, Roo Code integrations | [integration-architecture.md](./docs/framework/integration-architecture.md) |
+| Python / TypeScript SDKs | [product-ecosystem.md](./docs/framework/product-ecosystem.md) |
+| EventAPI, TemplateAPI, PluginAPI (Framework tier) | [framework-api.md](./docs/framework/framework-api.md) |
+| YAML-driven provider plugin discovery | [ai-execution README](./packages/ai_execution/README.md) |
+| Distributed / cloud runtime | [system-context.md](./docs/framework/system-context.md) |
+
+### Future Roadmap
+
+- Memory platform, metrics, cost optimization (extension points in orchestrator / AI execution)
+- Shared contracts package to eliminate cross-package type imports
+- Persisted orchestrator approval and checkpoint state
+- Marketplace, Dashboard, REST API, Language Server
+
+---
+
+## Execution Stack
+
+```
+CEO / User
+    │
+    ▼
+engineeringos CLI
+    │
+    ▼
+Framework API (company_core)
+    │
+    ├── Autonomous Company ── goal-based supervision, SDLC completion
+    ├── Workspace Execution ── session, context, resume
+    ├── Knowledge / Source Control / Parallel Execution
+    │
+    ▼
+Runtime (runtime_engine) ── lifecycle, gates, state
+    │
+    ▼
+Orchestrator ── sequencing, context, prompts
+    │
+    ├── Parallel Execution (when policy enables)
+    ▼
+AI Execution Platform ── providers
+    │
+    ▼
+Employees (agent prompts)
+```
 
 ---
 
 ## Repository Layout
 
 ```
-ai-company/
-├── handbook/              # Company standards and policies
-├── mcp/                   # MCP Platform (registry, capabilities, policies)
-├── mcp_platform/          # MCP validation tooling
+engineeringos/
+├── handbook/                  # Company standards
+├── mcp/                       # MCP registry, capabilities, policies
+├── mcp_platform/              # MCP validation tooling
 ├── packages/
-│   ├── company_core/      # Framework API (manifest, models)
-│   ├── company_cli/       # EngineeringOS CLI (engineeringos)
-│   ├── runtime_engine/    # Company Kernel (Runtime v1)
-│   ├── ai_execution/      # AI Execution Platform (provider boundary)
-│   ├── orchestrator/      # Operational intelligence layer
-│   ├── workspace_execution/ # Context-aware execution sessions
-│   ├── knowledge/           # Permanent engineering intelligence
-│   ├── source_control/      # Repository management platform
-│   ├── parallel_execution/  # Concurrent employee scheduling
-│   └── autonomous_company/  # Autonomous engineering company
-│   └── company_lifecycle/ # Installation & lifecycle platform
-├── tests/                 # CLI and Framework API tests
-├── company.yaml           # Dev company instance manifest
-├── .cursor/agents/        # Employee agent prompts (Cursor adapter)
-├── workflow.yaml          # Machine-readable SDLc
-├── workflow-v1.md         # Human-readable SDLc
+│   ├── company_core/          # Framework API
+│   ├── company_cli/           # engineeringos CLI
+│   ├── company_lifecycle/     # Installation & lifecycle
+│   ├── runtime_engine/        # Company Kernel
+│   ├── orchestrator/          # Operational intelligence
+│   ├── ai_execution/          # Provider boundary
+│   ├── workspace_execution/   # Execution sessions
+│   ├── knowledge/             # Engineering intelligence
+│   ├── source_control/        # Repository management
+│   ├── parallel_execution/    # Concurrent scheduling
+│   └── autonomous_company/    # Autonomous engineering company
 ├── runtime/
-│   └── interfaces.md      # Company Kernel public API (constitution)
+│   ├── interfaces.md          # Kernel public API (frozen)
+│   └── employee-registry.yaml
 ├── docs/
-│   ├── framework/         # Constitutional architecture (v2)
-│   └── adr/               # ADRs 0001–0012
-├── projects/
-│   └── framework-architecture/   # Active SDLc (design phase complete)
-├── company-manifest.md    # company.yaml specification
-├── cleanup-report.md      # GitHub release cleanup inventory
-└── can_be_deleted/        # Historical files (preserved, not in release)
+│   ├── framework/             # Constitutional architecture
+│   ├── alignment/             # Documentation alignment reports (2026-07-02)
+│   ├── audit/                 # Architecture self-audit
+│   ├── cli/, orchestrator/, ai-execution/, lifecycle/, …
+│   └── adr/                   # ADRs 0001–0012
+├── tests/                     # 128 automated tests
+├── company.yaml               # Dev company instance
+├── workflow.yaml              # Machine-readable SDLC
+└── .cursor/agents/            # Employee prompts (Cursor adapter)
 ```
 
 ---
 
-## Core Components
+## Platform Documentation
 
-### SDLc Workflow
-
-Eleven phases: Idea → Requirements → Specification → Planning → Architecture → Implementation → Testing → Review → **Documentation** → Release → Closure.
-
-Each phase has a quality gate (G0–G9), artifact ownership, and rework routing.
-
-### Employees
-
-Ten specialist agents coordinated by the **Engineering Manager**:
-
-| Agent | Phase |
-|-------|-------|
-| Engineering Manager | Orchestration |
-| Product Manager | Requirements |
-| Business Analyst | Specification |
-| Software Planner | Planning |
-| Software Architect | Architecture |
-| Backend / Frontend Engineer | Implementation |
-| QA Engineer | Testing |
-| Code Reviewer | Review |
-| **Documentation Engineer** | **Documentation** |
-
-### MCP Platform
-
-Employees request **capabilities** (not MCP names). The registry resolves tools.
-
-```bash
-python -m mcp_platform validate
-python -m mcp_platform resolve documentation-lookup
-```
-
-See [mcp/selection-policy.md](./mcp/selection-policy.md).
-
-### Company Kernel
-
-Public runtime contracts in [runtime/interfaces.md](./runtime/interfaces.md). **Runtime v1** (`runtime_engine`) executes the planning pipeline (Idea → Architecture).
-
-```bash
-engineeringos project create --yes --name "My App" --location ./projects/my-app
-engineeringos project status my-app
-```
-
-See [packages/runtime_engine/README.md](./packages/runtime_engine/README.md).
-
-### AI Execution Platform
-
-All AI provider communication flows through `ai_execution` — Runtime never calls Cursor or any provider directly.
-
-See [packages/ai_execution/README.md](./packages/ai_execution/README.md) and [docs/ai-execution/README.md](./docs/ai-execution/README.md).
-
-### Orchestrator
-
-Sequences employees, assembles context, builds prompts, and routes conversations. Runtime delegates all orchestration intelligence here.
-
-See [packages/orchestrator/README.md](./packages/orchestrator/README.md) and [docs/orchestrator/README.md](./docs/orchestrator/README.md).
-
-### Installation & Lifecycle Platform
-
-Generates user-owned companies, workspaces, and projects. Framework is installed once; companies reference it via `framework.install_path`.
-
-See [packages/company_lifecycle/README.md](./packages/company_lifecycle/README.md) and [docs/lifecycle/README.md](./docs/lifecycle/README.md).
-
-### Workspace Execution Platform
-
-Persistent execution context — active company, workspace, project, phase, and intelligent resume.
-
-See [packages/workspace_execution/README.md](./packages/workspace_execution/README.md) and [docs/workspace-execution/README.md](./docs/workspace-execution/README.md).
-
-### Knowledge Platform
-
-Permanent engineering intelligence — durable knowledge with traceability, validation, and contextual retrieval.
-
-See [packages/knowledge/README.md](./packages/knowledge/README.md) and [docs/knowledge/README.md](./docs/knowledge/README.md).
-
-### Source Control Platform
-
-Repository management by the Source Control Engineer — automatic repo discovery, knowledge-informed commits, EM-approved operations.
-
-See [packages/source_control/README.md](./packages/source_control/README.md) and [docs/source-control/README.md](./docs/source-control/README.md).
-
-### Parallel Execution Engine
-
-Safe concurrent employee execution — dependency graphs, worker pools, synchronization barriers, and conflict detection.
-
-See [packages/parallel_execution/README.md](./packages/parallel_execution/README.md) and [docs/parallel-execution/README.md](./docs/parallel-execution/README.md).
-
-### Autonomous Company Platform
-
-Self-operating engineering company — goal-based execution, blocker detection, explainable decisions, and automatic pipeline continuation.
-
-See [packages/autonomous_company/README.md](./packages/autonomous_company/README.md) and [docs/autonomous-company/README.md](./docs/autonomous-company/README.md).
-
-### Framework API
-
-All products (CLI, editors, SDK, cloud) consume the [Framework API](./docs/framework/framework-api.md) — no bypass.
+| Platform | Package README | User docs |
+|----------|---------------|-----------|
+| Lifecycle | [packages/company_lifecycle/README.md](./packages/company_lifecycle/README.md) | [docs/lifecycle/](./docs/lifecycle/) |
+| Workspace Execution | [packages/workspace_execution/README.md](./packages/workspace_execution/README.md) | [docs/workspace-execution/](./docs/workspace-execution/) |
+| Knowledge | [packages/knowledge/README.md](./packages/knowledge/README.md) | [docs/knowledge/](./docs/knowledge/) |
+| Source Control | [packages/source_control/README.md](./packages/source_control/README.md) | [docs/source-control/](./docs/source-control/) |
+| Parallel Execution | [packages/parallel_execution/README.md](./packages/parallel_execution/README.md) | [docs/parallel-execution/](./docs/parallel-execution/) |
+| Autonomous Company | [packages/autonomous_company/README.md](./packages/autonomous_company/README.md) | [docs/autonomous-company/](./docs/autonomous-company/) |
+| Runtime | [packages/runtime_engine/README.md](./packages/runtime_engine/README.md) | [runtime/interfaces.md](./runtime/interfaces.md) |
+| Orchestrator | [packages/orchestrator/README.md](./packages/orchestrator/README.md) | [docs/orchestrator/](./docs/orchestrator/) |
+| AI Execution | [packages/ai_execution/README.md](./packages/ai_execution/README.md) | [docs/ai-execution/](./docs/ai-execution/) |
+| CLI | [packages/company_cli/README.md](./packages/company_cli/README.md) | [docs/cli/README.md](./docs/cli/README.md) |
 
 ---
 
-## Concept Stack
+## Known Limitations
 
-```
-Framework (immutable product)
-    └── Company Instance (company.yaml)
-            └── Workspace (workspaces/<id>/)
-                    └── Project (projects/<id>/)
-```
+### Experimental / preview quality
 
-See [docs/framework/domain-model.md](./docs/framework/domain-model.md) for 20 defined concepts.
+- EngineeringOS is **architecture-stable** but **not production-hardened**. Suitable for development and evaluation, not unattended production deployment without review.
+- Autonomous Company Platform runs supervision cycles; long-running unattended operation depends on local git identity, approvals, and policy configuration.
+
+### Provider limitations
+
+- **CursorProvider** does not invoke Cursor AI APIs — it loads employee prompts and scaffolds phase artifacts.
+- **Placeholder providers** (OpenAI, Anthropic, Gemini, etc.) are registered but not fully implemented.
+- Provider registration is **code-based** in `ai_execution/factory.py`, not YAML-plugin-driven.
+
+### Autonomous limitations
+
+- Runner executes discrete supervision cycles (`max_cycles` default 1 per `continue`); does not run an infinite background daemon.
+- Blocker detection covers session, runtime, and repository states — not all blocker types are wired to live subsystems.
+- `complete_sdlc()` requires commit approval and git author identity (env vars or local git config).
+- Push occurs only when `policy.auto_push` or `auto_push=True` is set **and** push is approved.
+
+### Checkpoint limitations
+
+- Orchestrator checkpoints and approval hooks are **partially ephemeral** (in-memory). Process restart may lose checkpoint state not mirrored in Runtime `PipelineState` or `.company/` session files.
+- Parallel execution checkpoint recovery depends on platform availability at recover time.
+
+### Production readiness
+
+- **128 tests** cover core platforms; `mcp_platform` has limited dedicated test coverage.
+- Policy fields such as `timeout_seconds` and `mcp_evidence_required` are resolved but **not enforced** in all paths.
+- `AgentInvocationFailed` kernel event is specified but **not emitted** on all adapter failures.
+
+### Installation assumptions
+
+- Monorepo editable install: `pip install -e ".[dev]"` from repository root.
+- `company.yaml` `framework.install_path` should point at framework root for instance companies.
+- Git operations require a configured author identity for commits.
+
+### Architectural debt
+
+Published openly in [docs/audit/](./docs/audit/):
+
+| Issue | Severity |
+|-------|----------|
+| `company_core → runtime_engine` dependency | Documented violation |
+| Orchestrator mutates `PipelineState` without Runtime-owned mutation port | High |
+| Four `discover_framework_root` heuristics across packages | Medium — **consolidated** to `company_core.config.loader.discover_framework_root_from_path` |
+| `mcp_platform` at repo root vs `packages/` convention | Medium |
+| ~~Dead code: `em_runner.py`, `runtime_engine/adapters/scaffold.py`~~ | **Removed** (2026-07-02 cleanup) |
+
+See [docs/audit/technical-debt.md](./docs/audit/technical-debt.md) and [docs/audit/architecture-compliance.md](./docs/audit/architecture-compliance.md).
+
+---
+
+## Self-Audit
+
+EngineeringOS publishes its architecture audit — known issues are not hidden.
+
+| Report | Purpose |
+|--------|---------|
+| [implementation-audit.md](./docs/audit/implementation-audit.md) | Full codebase audit |
+| [architecture-compliance.md](./docs/audit/architecture-compliance.md) | Contract compliance matrix |
+| [technical-debt.md](./docs/audit/technical-debt.md) | Debt register |
+| [dependency-analysis.md](./docs/audit/dependency-analysis.md) | Import graph |
+| [release-readiness.md](./docs/audit/release-readiness.md) | Release assessment |
+| [future-extension-readiness.md](./docs/audit/future-extension-readiness.md) | Extension point analysis |
+
+Documentation alignment deliverables: [docs/alignment/](./docs/alignment/).
 
 ---
 
 ## Development Setup
 
 ```bash
-cd ai-company
+cd engineeringos
 python -m venv .venv
 .venv\Scripts\activate        # Windows
 pip install -e ".[dev]"
 engineeringos version
 python -m mcp_platform validate
+pytest tests/ -q
 ```
 
-### EngineeringOS CLI
+### Example CLI flows
 
 ```bash
-engineeringos --help
-engineeringos init ./my-instance --id my-company
-engineeringos doctor
-engineeringos validate
-engineeringos mcp list
+# Company instance
+engineeringos init ./my-co --id my-co --yes
+engineeringos open
+engineeringos workspace create dev
+engineeringos project create my-app --yes
+
+# Autonomous execution
+engineeringos work "Implement user authentication"
+engineeringos continue
+engineeringos autonomy status
+
+# Knowledge and source control
+engineeringos knowledge search "architecture"
+engineeringos repo status
 ```
-
-Full command reference: [docs/cli/README.md](./docs/cli/README.md).
-
-Enable **sequential-thinking** MCP in Cursor (see [mcp/installation-guide.md](./mcp/installation-guide.md)).
 
 ---
 
@@ -205,37 +276,24 @@ Enable **sequential-thinking** MCP in Cursor (see [mcp/installation-guide.md](./
 
 | Document | Purpose |
 |----------|---------|
-| [framework-architecture.md](./docs/framework/framework-architecture.md) | **Master index** |
-| [framework-model.md](./docs/framework/framework-model.md) | Framework product definition |
-| [company-instance-model.md](./docs/framework/company-instance-model.md) | Company Instance |
-| [workspace-model.md](./docs/framework/workspace-model.md) | Workspace isolation |
-| [project-model.md](./docs/framework/project-model.md) | Project SDLc |
-| [framework-api.md](./docs/framework/framework-api.md) | Single consumption API |
-| [product-ecosystem.md](./docs/framework/product-ecosystem.md) | CLI, editors, SDK, cloud |
-| [cli-architecture.md](./docs/framework/cli-architecture.md) | `company` commands |
-| [package-architecture.md](./docs/framework/package-architecture.md) | Installable packages |
-| [integration-architecture.md](./docs/framework/integration-architecture.md) | Cursor, VS Code, Claude Code, Roo Code |
-| [plugin-architecture.md](./docs/framework/plugin-architecture.md) | Kernel + framework plugins |
-| [versioning-strategy.md](./docs/framework/versioning-strategy.md) | Semver and upgrades |
-| [lifecycle.md](./docs/framework/lifecycle.md) | Installation → maintenance |
-| [docs/adr/](./docs/adr/) | ADRs 0001–0012 |
+| [framework-architecture.md](./docs/framework/framework-architecture.md) | Master index |
+| [framework-api.md](./docs/framework/framework-api.md) | Framework API (implemented) |
+| [package-architecture.md](./docs/framework/package-architecture.md) | Package inventory |
+| [dependency-map.md](./docs/framework/dependency-map.md) | Layer rules and DAG |
+| [system-context.md](./docs/framework/system-context.md) | C4 diagrams |
+| [product-ecosystem.md](./docs/framework/product-ecosystem.md) | Product catalog |
+| [runtime/interfaces.md](./runtime/interfaces.md) | Kernel API (frozen) |
 
-**Design phase complete.** Future work is implementation — not architectural redesign.
-
----
-
-## Historical Archives
-
-Completed SDLc packages, meta-reports, and superseded planning documents are preserved in [can_be_deleted/](./can_be_deleted/). See [cleanup-report.md](./cleanup-report.md) for the full inventory.
+**Architecture is frozen.** Future work extends implementation within approved seams — not redesign.
 
 ---
 
 ## Contributing
 
 1. Read [handbook/company-handbook.md](./handbook/company-handbook.md)
-2. Follow SDLc — do not skip phases
+2. Follow SDLC — do not skip phases
 3. Employees must not modify upstream artifacts outside their phase
-4. MCP changes: edit `mcp/registry.yaml` only — not employee prompts
+4. MCP changes: edit `mcp/registry.yaml` — not employee prompts
 5. Do not modify framework files from workspace/project context
 
 ---

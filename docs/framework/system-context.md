@@ -1,6 +1,6 @@
 # System Context — AI Company Framework
 
-**Version:** 2.0.0  
+**Version:** 2.0.0 (alignment 2026-07-02)  
 **Date:** 2026-07-01  
 **Parent:** [framework-architecture.md](./framework-architecture.md)
 
@@ -54,48 +54,67 @@ flowchart TB
 ```mermaid
 flowchart TB
     subgraph Framework [Framework Repository / Install]
-        CLI[company CLI]
-        Core[company_core]
+        CLI[engineeringos CLI]
+        Core[company_core / FrameworkAPI]
+        LC[company_lifecycle]
+        WE[workspace_execution]
+        KN[knowledge]
+        SC[source_control]
+        PE[parallel_execution]
+        AC[autonomous_company]
         RT[runtime_engine]
+        OR[orchestrator]
+        AI[ai_execution]
         MCPPlat[mcp_platform]
         Content[Content: handbook, employees, workflow, mcp]
         Contracts[Contracts: interfaces.md, company.yaml]
     end
 
-    subgraph Workspace [User Workspace - gitignored]
+    subgraph Workspace [User Workspace]
         Projects[Projects]
-        State[.company/state]
+        State[.company/ session state]
     end
 
     subgraph Integrations [Editor Integrations]
-        CursorInt[Cursor Adapter]
-        VSCodeInt[VS Code Adapter]
+        CursorInt[Cursor .cursor/agents]
     end
 
     CLI --> Core
-    CLI --> RT
-    CLI --> MCPPlat
-    Core --> Contracts
+    Core --> LC
+    Core --> WE
+    Core --> KN
+    Core --> SC
+    Core --> PE
+    Core --> AC
+    Core --> RT
+    Core --> MCPPlat
+    RT --> OR
+    OR --> AI
+    OR --> PE
     RT --> Content
-    RT --> State
     MCPPlat --> Content
     CursorInt --> Content
-    VSCodeInt --> Content
     Projects --> RT
+    WE --> State
 ```
 
 ### Container Descriptions
 
 | Container | Technology | Responsibility |
 |-----------|------------|----------------|
-| **company CLI** | Python/Typer | Operator interface |
-| **company_core** | Python | Manifest, paths, models |
-| **runtime_engine** | Python | Kernel implementation |
+| **engineeringos CLI** | Python/Typer | Operator interface via `get_api()` |
+| **company_core** | Python | `FrameworkAPI` aggregate |
+| **company_lifecycle** | Python | init, workspaces, projects, templates |
+| **workspace_execution** | Python | Session, context, resume |
+| **runtime_engine** | Python | Kernel — lifecycle, gates, state |
+| **orchestrator** | Python | Sequencing, context, prompts |
+| **ai_execution** | Python | Provider boundary |
+| **knowledge / source_control / parallel_execution / autonomous_company** | Python | Platform services |
 | **mcp_platform** | Python | MCP validation |
 | **Content packages** | Markdown/YAML | Policies, agents, workflow |
 | **Contracts** | Markdown/YAML | Stable APIs |
-| **Workspace** | Filesystem | User projects + state |
-| **Integrations** | Config/symlinks | Editor wiring |
+| **Workspace** | Filesystem | User projects + `.company/` state |
+| **Integrations** | Config | `.cursor/agents/` (partial) |
 
 ---
 
@@ -116,17 +135,26 @@ flowchart LR
         PM[PluginManager]
     end
 
+    subgraph OrchestratorPkg [orchestrator]
+        OE[Orchestrator]
+        CE[ContextEngine]
+        PB[PromptBuilder]
+        PEx[PhaseExecutor]
+    end
+
+    subgraph AIExec [ai_execution]
+        EP[ExecutionPlatform]
+        AD[RuntimeAgentAdapter]
+    end
+
     Facade --> PE
     Facade --> GE
-    Facade --> RE
-    Facade --> VE
-    Facade --> AR
-    Facade --> SS
-    Facade --> EB
-    Facade --> WL
-    Facade --> PM
-    PE --> WL
-    GE --> VE
+    Facade --> OE
+    OE --> CE
+    OE --> PB
+    OE --> PEx
+    PEx --> AD
+    AD --> EP
 ```
 
 See [runtime/interfaces.md](../../runtime/interfaces.md) for interface details.
@@ -139,11 +167,12 @@ See [runtime/interfaces.md](../../runtime/interfaces.md) for interface details.
 
 ```
 Developer Machine
-├── Framework install (git clone ai-company/)
+├── Framework install (engineeringos repo)
 ├── .venv (local, not in git)
+├── company.yaml (instance manifest)
 ├── workspaces/default/
 │   └── projects/<feature>/
-└── Cursor IDE → integrations/cursor
+└── Cursor IDE → .cursor/agents/
 ```
 
 ### Installed Package (Future)

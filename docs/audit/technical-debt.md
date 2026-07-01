@@ -86,16 +86,17 @@
 
 ## Documentation Debt
 
-| Document | Issue |
-|----------|-------|
-| `docs/framework/package-architecture.md` | Marks implemented packages as "Planned"; missing orchestrator/ai_execution |
-| `docs/framework/framework-api.md` | States "not implemented" |
-| `docs/framework/dependency-map.md` | DAG missing orchestrator, ai_execution; data flow shows Runtime→Adapter directly |
-| `docs/framework/cli-architecture.md` | Binary name `company` vs `engineeringos` |
-| `docs/framework/product-ecosystem.md` | CLI status "Planned" |
-| `runtime/interfaces.md` | No orchestrator layer; missing pipeline methods; PAUSED status |
+| Document | Issue | Status (2026-07-02) |
+|----------|-------|----------------------|
+| `docs/framework/package-architecture.md` | Was stale | **Aligned** — see [alignment/contract-sync-report.md](../alignment/contract-sync-report.md) |
+| `docs/framework/framework-api.md` | Stated "not implemented" | **Aligned** |
+| `docs/framework/dependency-map.md` | Missing platforms | **Aligned** |
+| `docs/framework/cli-architecture.md` | `company` vs `engineeringos` | **Aligned** |
+| `docs/framework/product-ecosystem.md` | CLI "Planned" | **Aligned** |
+| `runtime/interfaces.md` | No orchestrator note | **Aligned** — §1.1 added |
+| Root `README.md` | Overstated completeness | **Aligned** — honesty matrix |
 
-**Debt type:** **Documentation lag**, not architectural wrongness. Requires **contract version bump + doc sync**, not code rewrite.
+**Remaining doc debt:** Formal `interfaces.md` v1.1 minor bump to add orchestrator to §3 diagram (optional).
 
 ---
 

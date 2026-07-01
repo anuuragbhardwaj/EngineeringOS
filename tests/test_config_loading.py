@@ -5,6 +5,7 @@ from pathlib import Path
 import yaml
 
 from company_core.config.loader import (
+    discover_framework_root_from_path,
     load_manifest,
     manifest_template,
     parse_manifest,
@@ -50,3 +51,10 @@ def test_repo_company_yaml_loads() -> None:
     assert manifest.instance_id == "ai-company-dev"
     content = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
     assert content["company"]["framework"]["version"] == "2.0.0"
+
+
+def test_discover_framework_root_from_path_repo() -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    root = discover_framework_root_from_path(repo_root)
+    assert root is not None
+    assert (root / "workflow.yaml").is_file()

@@ -29,7 +29,7 @@ The **Framework is the core product**. All other products are **consumers** of t
 | Product | Status | Consumes | Delivers |
 |---------|--------|----------|----------|
 | **AI Company Framework** | Shipped (content) | — | SDLc, employees, MCP, contracts |
-| **Company CLI** | Planned | Framework API | Operator commands |
+| **Company CLI** | **Shipped** (`engineeringos`) | Framework API | Operator commands |
 | **Cursor Integration** | Partial (.cursor/) | IntegrationAPI | Agent + MCP sync |
 | **VS Code Integration** | Planned | IntegrationAPI | Extension + MCP |
 | **Claude Code Integration** | Planned | IntegrationAPI | Agent config sync |
@@ -91,7 +91,8 @@ flowchart BT
 | Attribute | Value |
 |-----------|-------|
 | Package | `packages/company_cli` |
-| API | Full Framework API |
+| Binary | `engineeringos` |
+| API | Full Framework API via `get_api()` |
 | Role | Primary operator interface |
 | Doc | [cli-architecture.md](./cli-architecture.md) |
 
