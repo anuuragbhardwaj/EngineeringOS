@@ -1,0 +1,86 @@
+# EngineeringOS project template catalog
+# Templates are versioned and replaceable — framework-owned, applied to user projects.
+
+version: "1.0.0"
+
+profiles:
+  prototype:
+    description: Minimal prototype scaffold
+    version: "1.0.0"
+    files:
+      - README.md
+      - .gitignore
+
+  production:
+    description: Production-ready project scaffold
+    version: "1.0.0"
+    files:
+      - README.md
+      - .gitignore
+      - docs/README.md
+
+  cli:
+    description: CLI application template
+    version: "1.0.0"
+    extends: production
+    files:
+      - src/README.md
+
+  api:
+    description: API service template
+    version: "1.0.0"
+    extends: production
+    files:
+      - src/README.md
+      - tests/README.md
+
+  frontend:
+    description: Frontend application template
+    version: "1.0.0"
+    extends: production
+    files:
+      - src/README.md
+
+  backend:
+    description: Backend service template
+    version: "1.0.0"
+    extends: production
+    files:
+      - src/README.md
+      - tests/README.md
+
+  fullstack:
+    description: Full-stack application template
+    version: "1.0.0"
+    extends: production
+    files:
+      - src/README.md
+      - tests/README.md
+
+  library:
+    description: Reusable library package template
+    version: "1.0.0"
+    extends: production
+    files:
+      - src/README.md
+      - tests/README.md
+
+  package:
+    description: Python package template
+    version: "1.0.0"
+    extends: library
+
+  plugin:
+    description: EngineeringOS plugin template
+    version: "1.0.0"
+    extends: production
+    files:
+      - plugin.yaml
+      - README.md
+
+  agent:
+    description: Custom employee agent template
+    version: "1.0.0"
+    files:
+      - agent.md
+      - README.md

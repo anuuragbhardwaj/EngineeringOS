@@ -1,0 +1,11 @@
+workspace:
+  id: default
+  status: active
+  created_at: '2026-07-01T21:01:04.846787'
+  projects:
+  - id: cli-demo
+    path: C:\Users\DEAL\AppData\Local\Temp\pytest-of-DEAL\pytest-21\test_project_create_non_intera0\projects\cli-demo
+    created_at: '2026-07-01T21:01:04.869072'
+  - id: status-demo
+    path: C:\Users\DEAL\AppData\Local\Temp\pytest-of-DEAL\pytest-21\test_project_status_after_crea0\projects\status-demo
+    created_at: '2026-07-01T21:01:05.493516'

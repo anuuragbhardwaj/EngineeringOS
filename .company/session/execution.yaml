@@ -1,0 +1,25 @@
+framework_version: 2.0.0
+company_id: ai-company-dev
+instance_root: C:\Ai-Lab\engineeringos
+workspace_id: default
+project_id: status-demo
+pipeline: planning
+current_phase: architecture
+current_gate: null
+current_employee: null
+execution_status: active
+conversation_ids: {}
+runtime_state_location: null
+checkpoint_id: null
+last_activity: '2026-07-01T22:17:20.296733'
+recent_commands:
+- status
+recent_projects:
+- status-demo
+- cli-demo
+recent_workspaces: []
+provider_id: null
+pinned_workspaces: []
+pinned_projects: []
+favorite_workspaces: []
+favorite_projects: []

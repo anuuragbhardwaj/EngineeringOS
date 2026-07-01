@@ -24,14 +24,24 @@ dev = [
 engineeringos = "company_cli.main:run"
 
 [tool.setuptools]
-package-dir = { "company_core" = "packages/company_core/src/company_core", "company_cli" = "packages/company_cli/src/company_cli", "mcp_platform" = "mcp_platform", "runtime_engine" = "packages/runtime_engine/src/runtime_engine", "ai_execution" = "packages/ai_execution/src/ai_execution", "orchestrator" = "packages/orchestrator/src/orchestrator" }
-packages = ["company_core", "company_cli", "mcp_platform", "runtime_engine", "ai_execution", "orchestrator"]
+package-dir = { "company_core" = "packages/company_core/src/company_core", "company_cli" = "packages/company_cli/src/company_cli", "company_lifecycle" = "packages/company_lifecycle/src/company_lifecycle", "workspace_execution" = "packages/workspace_execution/src/workspace_execution", "knowledge" = "packages/knowledge/src/knowledge", "source_control" = "packages/source_control/src/source_control", "parallel_execution" = "packages/parallel_execution/src/parallel_execution", "autonomous_company" = "packages/autonomous_company/src/autonomous_company", "mcp_platform" = "mcp_platform", "runtime_engine" = "packages/runtime_engine/src/runtime_engine", "ai_execution" = "packages/ai_execution/src/ai_execution", "orchestrator" = "packages/orchestrator/src/orchestrator" }
+packages = ["company_core", "company_cli", "company_lifecycle", "workspace_execution", "knowledge", "source_control", "parallel_execution", "autonomous_company", "mcp_platform", "runtime_engine", "ai_execution", "orchestrator"]
+
+[tool.setuptools.package-data]
+company_lifecycle = ["templates_catalog/**/*"]
+knowledge = ["data/framework/*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = [
     "packages/company_core/src",
     "packages/company_cli/src",
+    "packages/company_lifecycle/src",
+    "packages/workspace_execution/src",
+    "packages/knowledge/src",
+    "packages/source_control/src",
+    "packages/parallel_execution/src",
+    "packages/autonomous_company/src",
     "packages/runtime_engine/src",
     "packages/ai_execution/src",
     "packages/orchestrator/src",

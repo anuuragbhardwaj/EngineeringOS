@@ -81,6 +81,30 @@ class AgentRegistry:
             expected_outputs=["pipeline-status.md"],
         )
 
+    def resolve_agent(
+        self,
+        agent_id: str,
+        phase_id: str,
+        workflow: WorkflowDefinition,
+    ) -> AgentDescriptor | None:
+        phase = workflow.phase_by_id(phase_id)
+        if phase is None:
+            return None
+        agent_cfg = self._config.get("agents", {}).get(agent_id, {})
+        framework_root = self._registry_path.parent.parent
+        prompt_rel = agent_cfg.get("prompt_path", f".cursor/agents/{agent_id}.md")
+        prompt_path = str((framework_root / prompt_rel).resolve())
+        return AgentDescriptor(
+            agent_id=agent_id,
+            role=agent_cfg.get("role", agent_id),
+            phase_id=phase_id,
+            primary_artifact=phase.primary_artifact,
+            parallel=True,
+            prompt_path=prompt_path if Path(prompt_path).is_file() else prompt_rel,
+            expected_inputs=list(phase.required_inputs),
+            expected_outputs=list(phase.required_outputs) or [phase.primary_artifact],
+        )
+
     def is_orchestrator(self, agent_id: str) -> bool:
         orchestrator = self._config.get("orchestrator", "engineering-manager")
         agent_cfg = self._config.get("agents", {}).get(agent_id, {})

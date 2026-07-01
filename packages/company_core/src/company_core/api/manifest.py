@@ -30,6 +30,10 @@ class ManifestAPI:
         self._instance_root = instance_root
         self._manifest: CompanyManifest | None = None
 
+    @property
+    def instance_root(self) -> Path | None:
+        return self._instance_root
+
     def load(self, path: Path | None = None) -> CompanyManifest:
         if path is not None:
             self._manifest = load_manifest(path)

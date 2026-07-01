@@ -61,6 +61,11 @@ class PromptBuilder:
         if context.mcp_evidence:
             sections.extend(["", "# MCP Evidence Context", self._format_dict(context.mcp_evidence)])
 
+        if context.knowledge_snippets:
+            sections.extend(["", "# Relevant Engineering Knowledge"])
+            for _key, snippet in list(context.knowledge_snippets.items())[:10]:
+                sections.extend(["", snippet[:1200]])
+
         sections.extend(["", "# Instructions", f"Produce: {context.deliverable}"])
         return "\n".join(sections)
 

@@ -28,6 +28,15 @@ def discover_framework_root(start: Path | None = None) -> Path:
     raise FileNotFoundError("Cannot locate framework root (workflow.yaml)")
 
 
+def _discover_instance_root_optional() -> Path | None:
+    try:
+        from company_core.config.loader import discover_instance_root
+
+        return discover_instance_root()
+    except Exception:
+        return None
+
+
 def create_runtime(
     framework_root: Path | None = None,
     workflow_path: str | None = None,
@@ -46,7 +55,10 @@ def create_runtime(
     store = JsonStateStore()
     registry = AgentRegistry(reg_path)
     adapter = create_runtime_adapter(framework_root=root)
-    orchestrator = create_orchestrator(adapter, registry, framework_root=root)
+    instance_root = _discover_instance_root_optional()
+    orchestrator = create_orchestrator(
+        adapter, registry, framework_root=root, instance_root=instance_root
+    )
 
     return Runtime(
         workflow_loader=workflow_loader,

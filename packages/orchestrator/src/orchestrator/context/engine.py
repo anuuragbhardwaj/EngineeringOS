@@ -29,6 +29,7 @@ class ContextEngine:
         company_config: dict | None = None,
         mcp_evidence: dict | None = None,
         conversation_id: str | None = None,
+        knowledge_snippets: dict[str, str] | None = None,
     ) -> AssembledContext:
         root = Path(artifact_root)
         if not root.is_absolute():
@@ -53,6 +54,7 @@ class ContextEngine:
             conversation_id=conversation_id,
             deliverable=deliverable,
             required_inputs=list(required_inputs),
+            knowledge_snippets=dict(knowledge_snippets or {}),
         )
 
     def _collect_artifacts(self, root: Path, names: list[str]) -> dict[str, str]:
@@ -91,4 +93,5 @@ class ContextEngine:
             conversation_id=context.conversation_id,
             deliverable=context.deliverable,
             required_inputs=context.required_inputs,
+            knowledge_snippets=dict(context.knowledge_snippets),
         )

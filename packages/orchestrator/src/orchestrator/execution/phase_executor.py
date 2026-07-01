@@ -33,6 +33,9 @@ class PhaseExecutor:
         history_recorder: HistoryRecorder,
         approval_hooks: ApprovalHooks,
         scheduler: ExecutionScheduler,
+        knowledge_provider: callable | None = None,
+        parallel_platform: object | None = None,
+        instance_root: str | None = None,
     ) -> None:
         self._adapter = adapter
         self._registry = agent_registry
@@ -44,6 +47,9 @@ class PhaseExecutor:
         self._history = history_recorder
         self._approval = approval_hooks
         self._scheduler = scheduler
+        self._knowledge = knowledge_provider
+        self._parallel = parallel_platform
+        self._instance_root = instance_root
 
     def execute(
         self,
@@ -121,21 +127,33 @@ class PhaseExecutor:
             phase=phase,
         )
 
-        for plan in plans:
-            for artifact_name in plan.deliverables:
-                self._execute_artifact(
-                    state=state,
-                    workflow=workflow,
-                    phase=phase,
-                    orchestrator_desc=orchestrator_desc,
-                    specialist=specialist,
-                    artifact_name=artifact_name,
-                    policy=policy,
-                    checkpoint_id=checkpoint.checkpoint_id,
-                    workflow_state=workflow_state,
-                    publish_event=publish_event,
-                    plan_template=plan.delegation_template,
-                )
+        if not policy.sequential and self._parallel:
+            self._execute_parallel(
+                state=state,
+                workflow=workflow,
+                phase=phase,
+                orchestrator_desc=orchestrator_desc,
+                policy=policy,
+                checkpoint_id=checkpoint.checkpoint_id,
+                workflow_state=workflow_state,
+                publish_event=publish_event,
+            )
+        else:
+            for plan in plans:
+                for artifact_name in plan.deliverables:
+                    self._execute_artifact(
+                        state=state,
+                        workflow=workflow,
+                        phase=phase,
+                        orchestrator_desc=orchestrator_desc,
+                        specialist=specialist,
+                        artifact_name=artifact_name,
+                        policy=policy,
+                        checkpoint_id=checkpoint.checkpoint_id,
+                        workflow_state=workflow_state,
+                        publish_event=publish_event,
+                        plan_template=plan.delegation_template,
+                    )
 
         if workflow.artifacts.orchestration.required:
             self._execute_artifact(
@@ -156,6 +174,65 @@ class PhaseExecutor:
         self._checkpoints.complete(checkpoint.checkpoint_id)
         state.updated_at = datetime.utcnow()
         return state
+
+    def _execute_parallel(
+        self,
+        *,
+        state: Any,
+        workflow: Any,
+        phase: Any,
+        orchestrator_desc: Any,
+        policy: ExecutionPolicy,
+        checkpoint_id: str,
+        workflow_state: dict,
+        publish_event: callable | None,
+    ) -> None:
+        from pathlib import Path
+        from runtime_engine.types import ParallelTrack, PhaseStatus
+
+        phase_id = state.current_phase_id
+        specialists = self._parallel.resolve_specialists(self._registry, phase_id, workflow)
+        plan = self._parallel.plan(
+            state.project_id,
+            phase_id,
+            workflow=workflow,
+            specialists=specialists,
+        )
+
+        def invoke_worker(*, specialist, employee_id, deliverable, worker_id, **kwargs):
+            self._execute_artifact(
+                state=state,
+                workflow=workflow,
+                phase=phase,
+                orchestrator_desc=orchestrator_desc,
+                specialist=specialist,
+                artifact_name=deliverable,
+                policy=policy,
+                checkpoint_id=checkpoint_id,
+                workflow_state=workflow_state,
+                publish_event=publish_event,
+                plan_template=f"EM delegates {{phase_name}} to {{role}} for {{artifact}} (worker {worker_id})",
+            )
+
+        instance_root = Path(self._instance_root) if self._instance_root else None
+        summary = self._parallel.execute(
+            plan,
+            invoke_worker,
+            instance_root=instance_root,
+            publish_event=publish_event,
+        )
+
+        for worker in plan.workers:
+            status = PhaseStatus.PASS if worker.status == "completed" else PhaseStatus.FAIL
+            state.execution.parallel_tracks.append(
+                ParallelTrack(
+                    track_id=worker.worker_id,
+                    agent_id=worker.employee_id,
+                    phase_id=phase_id,
+                    status=status,
+                    merge_complete=summary.merge_result.merged if summary.merge_result else False,
+                )
+            )
 
     def _execute_artifact(
         self,
@@ -186,6 +263,22 @@ class PhaseExecutor:
             state.project_id, specialist.agent_id, phase_id
         )
 
+        knowledge_snippets: dict[str, str] = {}
+        if self._knowledge:
+            try:
+                knowledge_snippets = self._knowledge(
+                    {
+                        "project_id": state.project_id,
+                        "phase_id": phase_id,
+                        "employee_id": specialist.agent_id,
+                        "artifact_root": state.artifact_root,
+                        "deliverable": artifact_name,
+                        "required_inputs": list(specialist.expected_inputs),
+                    }
+                ) or {}
+            except Exception:
+                knowledge_snippets = {}
+
         assembled = self._context.assemble(
             project_id=state.project_id,
             phase_id=phase_id,
@@ -199,6 +292,7 @@ class PhaseExecutor:
             execution_history=list(state.execution.history),
             mcp_evidence=state.metadata.get("mcp_evidence", {}),
             conversation_id=conversation_id,
+            knowledge_snippets=knowledge_snippets,
         )
         assembled = self._context.compress(assembled, policy.context_max_chars)
 

@@ -1,0 +1,14 @@
+id: eos-principle-context-aware
+knowledge_type: engineering_principle
+scope: framework
+title: Context-aware execution
+content: EngineeringOS maintains persistent execution context. Users should not repeatedly provide paths, project names, or identifiers.
+origin: framework
+owner: engineering-manager
+reason: Core operating system philosophy
+confidence: 1.0
+status: active
+tags:
+  - execution
+  - context
+  - philosophy

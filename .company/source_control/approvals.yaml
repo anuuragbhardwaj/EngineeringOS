@@ -1,0 +1,7 @@
+status-demo:commit:
+  action: commit
+  project_id: status-demo
+  approved: true
+  approved_by: engineering-manager
+  reason: ''
+  timestamp: '2026-07-01T22:17:21.623843'

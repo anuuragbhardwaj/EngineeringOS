@@ -35,7 +35,13 @@ ai-company/
 │   ├── company_cli/       # EngineeringOS CLI (engineeringos)
 │   ├── runtime_engine/    # Company Kernel (Runtime v1)
 │   ├── ai_execution/      # AI Execution Platform (provider boundary)
-│   └── orchestrator/      # Operational intelligence layer
+│   ├── orchestrator/      # Operational intelligence layer
+│   ├── workspace_execution/ # Context-aware execution sessions
+│   ├── knowledge/           # Permanent engineering intelligence
+│   ├── source_control/      # Repository management platform
+│   ├── parallel_execution/  # Concurrent employee scheduling
+│   └── autonomous_company/  # Autonomous engineering company
+│   └── company_lifecycle/ # Installation & lifecycle platform
 ├── tests/                 # CLI and Framework API tests
 ├── company.yaml           # Dev company instance manifest
 ├── .cursor/agents/        # Employee agent prompts (Cursor adapter)
@@ -112,6 +118,42 @@ See [packages/ai_execution/README.md](./packages/ai_execution/README.md) and [do
 Sequences employees, assembles context, builds prompts, and routes conversations. Runtime delegates all orchestration intelligence here.
 
 See [packages/orchestrator/README.md](./packages/orchestrator/README.md) and [docs/orchestrator/README.md](./docs/orchestrator/README.md).
+
+### Installation & Lifecycle Platform
+
+Generates user-owned companies, workspaces, and projects. Framework is installed once; companies reference it via `framework.install_path`.
+
+See [packages/company_lifecycle/README.md](./packages/company_lifecycle/README.md) and [docs/lifecycle/README.md](./docs/lifecycle/README.md).
+
+### Workspace Execution Platform
+
+Persistent execution context — active company, workspace, project, phase, and intelligent resume.
+
+See [packages/workspace_execution/README.md](./packages/workspace_execution/README.md) and [docs/workspace-execution/README.md](./docs/workspace-execution/README.md).
+
+### Knowledge Platform
+
+Permanent engineering intelligence — durable knowledge with traceability, validation, and contextual retrieval.
+
+See [packages/knowledge/README.md](./packages/knowledge/README.md) and [docs/knowledge/README.md](./docs/knowledge/README.md).
+
+### Source Control Platform
+
+Repository management by the Source Control Engineer — automatic repo discovery, knowledge-informed commits, EM-approved operations.
+
+See [packages/source_control/README.md](./packages/source_control/README.md) and [docs/source-control/README.md](./docs/source-control/README.md).
+
+### Parallel Execution Engine
+
+Safe concurrent employee execution — dependency graphs, worker pools, synchronization barriers, and conflict detection.
+
+See [packages/parallel_execution/README.md](./packages/parallel_execution/README.md) and [docs/parallel-execution/README.md](./docs/parallel-execution/README.md).
+
+### Autonomous Company Platform
+
+Self-operating engineering company — goal-based execution, blocker detection, explainable decisions, and automatic pipeline continuation.
+
+See [packages/autonomous_company/README.md](./packages/autonomous_company/README.md) and [docs/autonomous-company/README.md](./docs/autonomous-company/README.md).
 
 ### Framework API
 

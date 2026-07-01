@@ -1,0 +1,7 @@
+# Dependencies
+.venv/
+__pycache__/
+*.py[cod]
+.env
+.runtime/
+.company/

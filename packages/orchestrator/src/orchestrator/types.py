@@ -43,6 +43,7 @@ class AssembledContext:
     conversation_id: str | None = None
     deliverable: str = ""
     required_inputs: list[str] = field(default_factory=list)
+    knowledge_snippets: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass

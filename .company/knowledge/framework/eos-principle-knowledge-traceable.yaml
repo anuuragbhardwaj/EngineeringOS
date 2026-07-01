@@ -1,0 +1,26 @@
+id: eos-principle-knowledge-traceable
+knowledge_type: engineering_principle
+scope: framework
+title: Knowledge must be traceable
+content: Every piece of knowledge must have origin, owner, scope, confidence, type,
+  reason, timestamp, and source artifacts. Nothing becomes permanent without validation.
+origin: framework
+owner: engineering-manager
+reason: Knowledge Platform core philosophy
+confidence: 1.0
+status: active
+created_at: '2026-07-01T22:17:13.285568'
+updated_at: '2026-07-01T22:17:13.285568'
+version: 1
+source_artifacts: []
+tags:
+- knowledge
+- traceability
+- validation
+metadata: {}
+workspace_id: null
+project_id: null
+employee_id: null
+conversation_id: null
+usage_count: 1
+reviewer_approved: false

@@ -8,9 +8,7 @@ runner = CliRunner()
 
 
 PLACEHOLDER_COMMANDS = [
-    ["open"],
     ["config"],
-    ["workspace", "list"],
     ["employees"],
 ]
 
@@ -25,4 +23,4 @@ def test_placeholder_commands_exit_zero() -> None:
 def test_open_accepts_workspace_option() -> None:
     result = runner.invoke(app, ["open", "--workspace", "default"])
     assert result.exit_code == 0
-    assert "Not Yet Implemented" in result.stdout
+    assert "Opened" in result.stdout

@@ -27,6 +27,9 @@ class Orchestrator:
         agent_registry: Any,
         framework_root: Path,
         policies_path: Path,
+        knowledge_provider: callable | None = None,
+        parallel_platform: object | None = None,
+        instance_root: str | None = None,
     ) -> None:
         self._adapter = adapter
         self._registry = agent_registry
@@ -50,6 +53,9 @@ class Orchestrator:
             history_recorder=self._history,
             approval_hooks=self._approval,
             scheduler=self._scheduler,
+            knowledge_provider=knowledge_provider,
+            parallel_platform=parallel_platform,
+            instance_root=instance_root,
         )
         self._pipeline = PipelineExecutor(self._phase_executor)
 

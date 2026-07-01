@@ -25,3 +25,17 @@ agents:
     prompt_path: .cursor/agents/senior-software-architect.md
     required_capabilities:
       - documentation-lookup
+  source-control-engineer:
+    role: Source Control Engineer
+    prompt_path: .cursor/agents/source-control-engineer.md
+    required_capabilities:
+      - version-control
+  senior-backend-engineer:
+    role: Senior Backend Engineer
+    prompt_path: .cursor/agents/senior-backend-engineer.md
+  senior-frontend-engineer:
+    role: Senior Frontend Engineer
+    prompt_path: .cursor/agents/senior-frontend-engineer.md
+  documentation-engineer:
+    role: Documentation Engineer
+    prompt_path: .cursor/agents/documentation-engineer.md

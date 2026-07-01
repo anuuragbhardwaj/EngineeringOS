@@ -18,6 +18,14 @@ COMMAND_MODULES = (
     "company_cli.commands.workspace",
     "company_cli.commands.project",
     "company_cli.commands.employees",
+    "company_cli.commands.lifecycle",
+    "company_cli.commands.context_cmd",
+    "company_cli.commands.execution_cmd",
+    "company_cli.commands.company_nav",
+    "company_cli.commands.knowledge_cmd",
+    "company_cli.commands.autonomous_cmd",
+    "company_cli.commands.repo_cmd",
+    "company_cli.commands.parallel_cmd",
     "company_cli.commands.mcp",
 )
 
