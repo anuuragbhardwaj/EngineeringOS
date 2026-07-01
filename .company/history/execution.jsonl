@@ -56,3 +56,4 @@
 {command: null, detail: null, employee_id: null, event_type: project_selected, phase_id: null,   project_id: status-demo, provider_id: null, status: null, timestamp: '2026-07-01T22:17:09.523821',   workspace_id: default}
 {command: status, detail: null, employee_id: null, event_type: command, phase_id: null,   project_id: status-demo, provider_id: null, status: null, timestamp: '2026-07-01T22:17:19.885403',   workspace_id: null}
 {command: null, detail: null, employee_id: null, event_type: company_opened, phase_id: null,   project_id: null, provider_id: null, status: null, timestamp: '2026-07-01T22:17:20.239797',   workspace_id: default}
+{command: null, detail: 5126bba19a122f29ac345185f2e253a90cb797eb, employee_id: null,   event_type: sdlc_commit, phase_id: null, project_id: status-demo, provider_id: null,   status: null, timestamp: '2026-07-01T22:17:23.245869', workspace_id: null}
