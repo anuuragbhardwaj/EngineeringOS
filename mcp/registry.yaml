@@ -1,0 +1,1013 @@
+# MCP Registry — Canonical Catalog
+# Authority: mcp/registry.yaml
+# Version: 1.0.0
+# Do not hardcode MCP names in employee prompts — use capabilities.yaml
+
+version: "1.0.0"
+updated: "2026-07-01"
+
+defaults:
+  runtime_compatibility:
+    kernel_version: ">=1.0.0"
+    cursor_sdk: true
+  health_status: unknown
+
+mcps:
+  # ─── FOUNDATION ───────────────────────────────────────────────────────────
+
+  context7:
+    name: Context7
+    category: foundation
+    integration_type: cursor-plugin
+    capabilities:
+      - documentation-lookup
+      - library-resolution
+    employees:
+      required:
+        - senior-software-architect
+        - senior-backend-engineer
+        - senior-frontend-engineer
+      optional:
+        - senior-software-planner
+        - senior-qa-engineer
+        - senior-code-reviewer
+        - engineering-manager
+    installation_status: available
+    health_status: healthy
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: none
+    configuration:
+      required_env: []
+      optional_env: []
+      cursor_config: null
+      notes: "Invoked via Cursor context7-plugin skill or CallMcpTool — not stdio MCP"
+    fallback_mcp: null
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: true
+    documentation_url: https://context7.com
+
+  sequential-thinking:
+    name: Sequential Thinking
+    category: foundation
+    integration_type: stdio
+    capabilities:
+      - structured-reasoning
+      - hypothesis-branching
+    employees:
+      required:
+        - senior-software-planner
+      optional:
+        - senior-business-analyst
+        - senior-software-architect
+        - engineering-manager
+        - senior-qa-engineer
+    installation_status: installed
+    health_status: healthy
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: none
+    configuration:
+      required_env: []
+      optional_env: []
+      cursor_config:
+        command: npx
+        args:
+          - "-y"
+          - "@modelcontextprotocol/server-sequential-thinking"
+    fallback_mcp: null
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: true
+    documentation_url: https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking
+
+  filesystem:
+    name: Filesystem MCP
+    category: foundation
+    integration_type: stdio
+    capabilities:
+      - filesystem-read
+      - filesystem-write
+    employees:
+      required: []
+      optional:
+        - senior-backend-engineer
+        - senior-frontend-engineer
+        - senior-qa-engineer
+    installation_status: not_installed
+    health_status: not_applicable
+    permissions:
+      filesystem: scoped
+      network: none
+      secrets: none
+    configuration:
+      required_env: []
+      optional_env: []
+      cursor_config:
+        command: npx
+        args:
+          - "-y"
+          - "@modelcontextprotocol/server-filesystem"
+          - "${workspaceFolder}"
+    fallback_mcp: null
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: true
+    documentation_url: https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem
+
+  git:
+    name: Git MCP
+    category: foundation
+    integration_type: stdio
+    capabilities:
+      - version-control
+      - diff-inspection
+    employees:
+      required: []
+      optional:
+        - senior-backend-engineer
+        - senior-frontend-engineer
+        - senior-code-reviewer
+        - engineering-manager
+    installation_status: not_installed
+    health_status: not_applicable
+    permissions:
+      filesystem: read
+      network: none
+      secrets: none
+    configuration:
+      required_env: []
+      optional_env: []
+      cursor_config:
+        command: uvx
+        args:
+          - mcp-server-git
+        notes: "Alternative: npx @modelcontextprotocol/server-git if available"
+    fallback_mcp: github
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: true
+    documentation_url: https://github.com/modelcontextprotocol/servers
+
+  github:
+    name: GitHub MCP
+    category: foundation
+    integration_type: stdio
+    capabilities:
+      - repository-hosting
+      - pull-request-management
+      - issue-tracking
+    employees:
+      required: []
+      optional:
+        - engineering-manager
+        - senior-code-reviewer
+        - senior-backend-engineer
+    installation_status: not_installed
+    health_status: not_applicable
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env:
+        - GITHUB_PERSONAL_ACCESS_TOKEN
+      optional_env: []
+      cursor_config:
+        command: npx
+        args:
+          - "-y"
+          - "@modelcontextprotocol/server-github"
+    fallback_mcp: git
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: true
+    documentation_url: https://github.com/github/github-mcp-server
+
+  playwright:
+    name: Playwright MCP
+    category: foundation
+    integration_type: stdio
+    capabilities:
+      - browser-automation
+      - e2e-testing
+    employees:
+      required: []
+      optional:
+        - senior-qa-engineer
+        - senior-frontend-engineer
+    installation_status: not_installed
+    health_status: not_applicable
+    permissions:
+      filesystem: read
+      network: outbound
+      secrets: none
+    configuration:
+      required_env: []
+      optional_env: []
+      cursor_config:
+        command: npx
+        args:
+          - "-y"
+          - "@playwright/mcp@latest"
+    fallback_mcp: null
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://github.com/microsoft/playwright-mcp
+
+  terminal:
+    name: Terminal MCP
+    category: foundation
+    integration_type: stdio
+    capabilities:
+      - shell-execution
+    employees:
+      required: []
+      optional:
+        - senior-backend-engineer
+        - senior-frontend-engineer
+        - senior-qa-engineer
+    installation_status: not_installed
+    health_status: not_applicable
+    permissions:
+      filesystem: scoped
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env: []
+      optional_env: []
+      cursor_config:
+        notes: "Use Cursor built-in Shell tool when Terminal MCP not installed"
+    fallback_mcp: null
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: true
+    documentation_url: null
+
+  fetch:
+    name: Fetch MCP
+    category: foundation
+    integration_type: stdio
+    capabilities:
+      - web-fetch
+      - http-request
+    employees:
+      required: []
+      optional:
+        - senior-business-analyst
+        - senior-software-architect
+        - senior-backend-engineer
+    installation_status: not_installed
+    health_status: not_applicable
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: none
+    configuration:
+      required_env: []
+      optional_env: []
+      cursor_config:
+        command: npx
+        args:
+          - "-y"
+          - "@modelcontextprotocol/server-fetch"
+    fallback_mcp: null
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: true
+    documentation_url: https://github.com/modelcontextprotocol/servers/tree/main/src/fetch
+
+  # ─── DATABASE ─────────────────────────────────────────────────────────────
+
+  sqlite:
+    name: SQLite MCP
+    category: database
+    integration_type: stdio
+    capabilities:
+      - sql-database
+      - embedded-database
+    employees:
+      required: []
+      optional:
+        - senior-backend-engineer
+        - senior-software-architect
+    installation_status: not_installed
+    health_status: not_applicable
+    permissions:
+      filesystem: read-write
+      network: none
+      secrets: none
+    configuration:
+      required_env: []
+      optional_env: []
+      cursor_config:
+        notes: "Package varies — see installation-guide.md"
+    fallback_mcp: null
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: null
+
+  postgresql:
+    name: PostgreSQL MCP
+    category: database
+    integration_type: stdio
+    capabilities:
+      - sql-database
+      - relational-database
+    employees:
+      required: []
+      optional:
+        - senior-backend-engineer
+        - senior-software-architect
+    installation_status: not_installed
+    health_status: not_applicable
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env:
+        - DATABASE_URL
+      optional_env: []
+      cursor_config: null
+    fallback_mcp: sqlite
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: null
+
+  mysql:
+    name: MySQL MCP
+    category: database
+    integration_type: stdio
+    capabilities:
+      - sql-database
+      - relational-database
+    employees:
+      required: []
+      optional:
+        - senior-backend-engineer
+    installation_status: not_installed
+    health_status: not_applicable
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env:
+        - MYSQL_CONNECTION_STRING
+      optional_env: []
+      cursor_config: null
+    fallback_mcp: postgresql
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: null
+
+  neo4j:
+    name: Neo4j MCP
+    category: database
+    integration_type: stdio
+    capabilities:
+      - graph-database
+      - knowledge-graph
+    employees:
+      required: []
+      optional:
+        - senior-software-architect
+        - senior-backend-engineer
+    installation_status: not_installed
+    health_status: not_applicable
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env:
+        - NEO4J_URI
+        - NEO4J_USERNAME
+        - NEO4J_PASSWORD
+      optional_env: []
+      cursor_config: null
+    fallback_mcp: null
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://neo4j.com
+
+  # ─── RESEARCH ─────────────────────────────────────────────────────────────
+
+  tavily:
+    name: Tavily MCP
+    category: research
+    integration_type: stdio
+    capabilities:
+      - web-search
+      - research-synthesis
+    employees:
+      required: []
+      optional:
+        - senior-product-manager
+        - senior-business-analyst
+        - engineering-manager
+    installation_status: not_installed
+    health_status: not_applicable
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env:
+        - TAVILY_API_KEY
+      optional_env: []
+      cursor_config: null
+    fallback_mcp: firecrawl
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://tavily.com
+
+  firecrawl:
+    name: Firecrawl MCP
+    category: research
+    integration_type: stdio
+    capabilities:
+      - web-scraping
+      - web-search
+    employees:
+      required: []
+      optional:
+        - senior-business-analyst
+        - senior-software-architect
+    installation_status: not_installed
+    health_status: not_applicable
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env:
+        - FIRECRAWL_API_KEY
+      optional_env: []
+      cursor_config: null
+    fallback_mcp: exa
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://firecrawl.dev
+
+  exa:
+    name: Exa MCP
+    category: research
+    integration_type: stdio
+    capabilities:
+      - semantic-search
+      - web-search
+    employees:
+      required: []
+      optional:
+        - senior-product-manager
+        - senior-business-analyst
+    installation_status: not_installed
+    health_status: not_applicable
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env:
+        - EXA_API_KEY
+      optional_env: []
+      cursor_config: null
+    fallback_mcp: tavily
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://exa.ai
+
+  # ─── DEVOPS (policy only) ─────────────────────────────────────────────────
+
+  docker:
+    name: Docker MCP
+    category: devops
+    integration_type: policy-only
+    capabilities:
+      - container-management
+    employees:
+      required: []
+      optional:
+        - senior-backend-engineer
+        - engineering-manager
+    installation_status: policy_only
+    health_status: not_applicable
+    permissions:
+      filesystem: scoped
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env: []
+      optional_env: []
+      cursor_config: null
+    fallback_mcp: null
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://docs.docker.com
+
+  aws:
+    name: AWS MCP
+    category: devops
+    integration_type: policy-only
+    capabilities:
+      - cloud-aws
+    employees:
+      required: []
+      optional:
+        - senior-backend-engineer
+        - engineering-manager
+    installation_status: policy_only
+    health_status: not_applicable
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: vault
+    configuration:
+      required_env:
+        - AWS_ACCESS_KEY_ID
+        - AWS_SECRET_ACCESS_KEY
+      optional_env:
+        - AWS_REGION
+      cursor_config: null
+    fallback_mcp: null
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://aws.amazon.com
+
+  azure:
+    name: Azure MCP
+    category: devops
+    integration_type: policy-only
+    capabilities:
+      - cloud-azure
+    employees:
+      required: []
+      optional:
+        - senior-backend-engineer
+        - engineering-manager
+    installation_status: policy_only
+    health_status: not_applicable
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: vault
+    configuration:
+      required_env:
+        - AZURE_SUBSCRIPTION_ID
+      optional_env: []
+      cursor_config: null
+    fallback_mcp: aws
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://azure.microsoft.com
+
+  terraform:
+    name: Terraform MCP
+    category: devops
+    integration_type: policy-only
+    capabilities:
+      - infrastructure-as-code
+    employees:
+      required: []
+      optional:
+        - senior-software-architect
+        - senior-backend-engineer
+    installation_status: policy_only
+    health_status: not_applicable
+    permissions:
+      filesystem: read-write
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env: []
+      optional_env:
+        - TF_VAR_*
+      cursor_config: null
+    fallback_mcp: null
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://terraform.io
+
+  kubernetes:
+    name: Kubernetes MCP
+    category: devops
+    integration_type: policy-only
+    capabilities:
+      - container-orchestration
+    employees:
+      required: []
+      optional:
+        - senior-backend-engineer
+        - engineering-manager
+    installation_status: policy_only
+    health_status: not_applicable
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: vault
+    configuration:
+      required_env: []
+      optional_env:
+        - KUBECONFIG
+      cursor_config: null
+    fallback_mcp: docker
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://kubernetes.io
+
+  # ─── PRODUCTIVITY (policy only) ───────────────────────────────────────────
+
+  slack:
+    name: Slack MCP
+    category: productivity
+    integration_type: policy-only
+    capabilities:
+      - team-notification
+      - chat-integration
+    employees:
+      required: []
+      optional:
+        - engineering-manager
+        - senior-product-manager
+    installation_status: policy_only
+    health_status: not_applicable
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env:
+        - SLACK_BOT_TOKEN
+      optional_env: []
+      cursor_config: null
+    fallback_mcp: null
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://slack.com
+
+  notion:
+    name: Notion MCP
+    category: productivity
+    integration_type: policy-only
+    capabilities:
+      - documentation-wiki
+      - knowledge-base
+    employees:
+      required: []
+      optional:
+        - senior-product-manager
+        - senior-business-analyst
+    installation_status: policy_only
+    health_status: not_applicable
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env:
+        - NOTION_API_KEY
+      optional_env: []
+      cursor_config: null
+    fallback_mcp: null
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://notion.so
+
+  jira:
+    name: Jira MCP
+    category: productivity
+    integration_type: policy-only
+    capabilities:
+      - issue-tracking
+      - project-management
+    employees:
+      required: []
+      optional:
+        - senior-product-manager
+        - engineering-manager
+    installation_status: policy_only
+    health_status: not_applicable
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env:
+        - JIRA_API_TOKEN
+        - JIRA_BASE_URL
+      optional_env: []
+      cursor_config: null
+    fallback_mcp: linear
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://atlassian.com/jira
+
+  linear:
+    name: Linear MCP
+    category: productivity
+    integration_type: policy-only
+    capabilities:
+      - issue-tracking
+      - project-management
+    employees:
+      required: []
+      optional:
+        - senior-product-manager
+        - engineering-manager
+    installation_status: policy_only
+    health_status: not_applicable
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env:
+        - LINEAR_API_KEY
+      optional_env: []
+      cursor_config: null
+    fallback_mcp: jira
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://linear.app
+
+  github-projects:
+    name: GitHub Projects MCP
+    category: productivity
+    integration_type: policy-only
+    capabilities:
+      - project-management
+      - kanban-board
+    employees:
+      required: []
+      optional:
+        - engineering-manager
+        - senior-product-manager
+    installation_status: policy_only
+    health_status: not_applicable
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env:
+        - GITHUB_PERSONAL_ACCESS_TOKEN
+      optional_env: []
+      cursor_config: null
+    fallback_mcp: linear
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://github.com/features/issues
+
+  # ─── QUALITY (policy only) ────────────────────────────────────────────────
+
+  promptfoo:
+    name: Promptfoo MCP
+    category: quality
+    integration_type: policy-only
+    capabilities:
+      - llm-evaluation
+      - prompt-testing
+    employees:
+      required: []
+      optional:
+        - senior-qa-engineer
+    installation_status: policy_only
+    health_status: not_applicable
+    permissions:
+      filesystem: read-write
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env: []
+      optional_env:
+        - OPENAI_API_KEY
+      cursor_config: null
+    fallback_mcp: null
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://promptfoo.dev
+
+  deepeval:
+    name: DeepEval MCP
+    category: quality
+    integration_type: policy-only
+    capabilities:
+      - llm-evaluation
+      - metric-testing
+    employees:
+      required: []
+      optional:
+        - senior-qa-engineer
+    installation_status: policy_only
+    health_status: not_applicable
+    permissions:
+      filesystem: read
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env: []
+      optional_env: []
+      cursor_config: null
+    fallback_mcp: promptfoo
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://deepeval.com
+
+  ragas:
+    name: Ragas MCP
+    category: quality
+    integration_type: policy-only
+    capabilities:
+      - rag-evaluation
+      - llm-evaluation
+    employees:
+      required: []
+      optional:
+        - senior-qa-engineer
+    installation_status: policy_only
+    health_status: not_applicable
+    permissions:
+      filesystem: read
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env: []
+      optional_env: []
+      cursor_config: null
+    fallback_mcp: deepeval
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://ragas.io
+
+  semgrep:
+    name: Semgrep MCP
+    category: quality
+    integration_type: policy-only
+    capabilities:
+      - static-analysis
+      - security-scanning
+    employees:
+      required: []
+      optional:
+        - senior-code-reviewer
+        - senior-qa-engineer
+    installation_status: policy_only
+    health_status: not_applicable
+    permissions:
+      filesystem: read
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env: []
+      optional_env:
+        - SEMGREP_APP_TOKEN
+      cursor_config: null
+    fallback_mcp: null
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://semgrep.dev
+
+  gitguardian:
+    name: GitGuardian MCP
+    category: quality
+    integration_type: policy-only
+    capabilities:
+      - secret-scanning
+      - security-scanning
+    employees:
+      required: []
+      optional:
+        - senior-code-reviewer
+    installation_status: policy_only
+    health_status: not_applicable
+    permissions:
+      filesystem: read
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env:
+        - GITGUARDIAN_API_KEY
+      optional_env: []
+      cursor_config: null
+    fallback_mcp: semgrep
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://gitguardian.com
+
+  # ─── OBSERVABILITY (policy only) ──────────────────────────────────────────
+
+  sentry:
+    name: Sentry MCP
+    category: observability
+    integration_type: policy-only
+    capabilities:
+      - error-tracking
+      - incident-management
+    employees:
+      required: []
+      optional:
+        - senior-backend-engineer
+        - senior-qa-engineer
+        - engineering-manager
+    installation_status: policy_only
+    health_status: not_applicable
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env:
+        - SENTRY_AUTH_TOKEN
+      optional_env: []
+      cursor_config: null
+    fallback_mcp: null
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://sentry.io
+
+  grafana:
+    name: Grafana MCP
+    category: observability
+    integration_type: policy-only
+    capabilities:
+      - metrics-dashboard
+      - monitoring
+    employees:
+      required: []
+      optional:
+        - senior-backend-engineer
+        - engineering-manager
+    installation_status: policy_only
+    health_status: not_applicable
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: env-var
+    configuration:
+      required_env:
+        - GRAFANA_API_KEY
+      optional_env:
+        - GRAFANA_URL
+      cursor_config: null
+    fallback_mcp: prometheus
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://grafana.com
+
+  prometheus:
+    name: Prometheus MCP
+    category: observability
+    integration_type: policy-only
+    capabilities:
+      - metrics-collection
+      - monitoring
+    employees:
+      required: []
+      optional:
+        - senior-backend-engineer
+    installation_status: policy_only
+    health_status: not_applicable
+    permissions:
+      filesystem: none
+      network: outbound
+      secrets: none
+    configuration:
+      required_env: []
+      optional_env:
+        - PROMETHEUS_URL
+      cursor_config: null
+    fallback_mcp: null
+    runtime_compatibility:
+      kernel_version: ">=1.0.0"
+      cursor_sdk: false
+    documentation_url: https://prometheus.io

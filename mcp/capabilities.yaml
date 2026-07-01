@@ -1,0 +1,434 @@
+# Capability Map — Employees request capabilities; registry resolves MCPs
+# Authority: mcp/capabilities.yaml
+# Version: 1.0.0
+
+version: "1.0.0"
+updated: "2026-07-01"
+
+# Resolution order: primary_mcp → fallback_chain (first installed wins)
+# See mcp/selection-policy.md for conflict and offline rules
+
+capabilities:
+  structured-reasoning:
+    description: Decompose problems, sequence tasks, branch hypotheses, revise plans
+    primary_mcp: sequential-thinking
+    fallback_chain: []
+    evidence_required: true
+    evidence_format: "Footer in artifact with completion note"
+    phases:
+      - planning
+
+  hypothesis-branching:
+    description: Explore alternatives before committing to a design or plan
+    primary_mcp: sequential-thinking
+    fallback_chain: []
+    evidence_required: false
+    phases:
+      - planning
+      - architecture
+
+  documentation-lookup:
+    description: Query current library/framework documentation for accurate APIs
+    primary_mcp: context7
+    fallback_chain:
+      - fetch
+    evidence_required: true
+    evidence_format: "References section with library IDs queried"
+    phases:
+      - architecture
+      - implementation
+
+  library-resolution:
+    description: Resolve package name to documentation library ID
+    primary_mcp: context7
+    fallback_chain: []
+    evidence_required: false
+    phases:
+      - architecture
+      - implementation
+
+  filesystem-read:
+    description: Read project files beyond agent default tools
+    primary_mcp: filesystem
+    fallback_chain: []
+    evidence_required: false
+    phases:
+      - implementation
+
+  filesystem-write:
+    description: Write files via MCP filesystem server
+    primary_mcp: filesystem
+    fallback_chain: []
+    evidence_required: false
+    phases:
+      - implementation
+
+  version-control:
+    description: Git operations — status, diff, log, branch
+    primary_mcp: git
+    fallback_chain:
+      - github
+    evidence_required: false
+    phases:
+      - implementation
+      - review
+
+  diff-inspection:
+    description: Inspect code changes for review
+    primary_mcp: git
+    fallback_chain:
+      - github
+    evidence_required: false
+    phases:
+      - review
+
+  repository-hosting:
+    description: GitHub repository operations — PRs, issues, actions
+    primary_mcp: github
+    fallback_chain:
+      - git
+    evidence_required: false
+    phases:
+      - review
+      - release
+
+  pull-request-management:
+    description: Create, review, merge pull requests
+    primary_mcp: github
+    fallback_chain: []
+    evidence_required: false
+    phases:
+      - review
+      - release
+
+  issue-tracking:
+    description: Create and update issues/tickets
+    primary_mcp: linear
+    fallback_chain:
+      - jira
+      - github
+    evidence_required: false
+    phases:
+      - requirements
+      - planning
+
+  browser-automation:
+    description: Browser interaction for E2E testing
+    primary_mcp: playwright
+    fallback_chain: []
+    evidence_required: true
+    evidence_format: "qa-report.md test evidence section"
+    phases:
+      - testing
+
+  e2e-testing:
+    description: End-to-end test execution via browser
+    primary_mcp: playwright
+    fallback_chain: []
+    evidence_required: true
+    phases:
+      - testing
+
+  shell-execution:
+    description: Run shell commands in controlled environment
+    primary_mcp: terminal
+    fallback_chain: []
+    evidence_required: false
+    notes: "Cursor built-in Shell tool is default when terminal MCP not installed"
+    phases:
+      - implementation
+      - testing
+
+  web-fetch:
+    description: HTTP GET for documentation or public APIs
+    primary_mcp: fetch
+    fallback_chain: []
+    evidence_required: false
+    phases:
+      - specification
+      - architecture
+
+  http-request:
+    description: HTTP requests for API exploration
+    primary_mcp: fetch
+    fallback_chain: []
+    evidence_required: false
+    phases:
+      - implementation
+
+  sql-database:
+    description: Query and manage SQL databases
+    primary_mcp: postgresql
+    fallback_chain:
+      - mysql
+      - sqlite
+    evidence_required: false
+    phases:
+      - implementation
+      - testing
+
+  embedded-database:
+    description: Local SQLite database operations
+    primary_mcp: sqlite
+    fallback_chain: []
+    evidence_required: false
+    phases:
+      - implementation
+
+  relational-database:
+    description: Production relational database access
+    primary_mcp: postgresql
+    fallback_chain:
+      - mysql
+    evidence_required: false
+    phases:
+      - implementation
+
+  graph-database:
+    description: Graph database queries (Neo4j)
+    primary_mcp: neo4j
+    fallback_chain: []
+    evidence_required: false
+    phases:
+      - architecture
+      - implementation
+
+  knowledge-graph:
+    description: Knowledge graph construction and query
+    primary_mcp: neo4j
+    fallback_chain: []
+    evidence_required: false
+    phases:
+      - architecture
+
+  web-search:
+    description: Search the web for research and competitive analysis
+    primary_mcp: tavily
+    fallback_chain:
+      - exa
+      - firecrawl
+    evidence_required: false
+    phases:
+      - requirements
+      - idea
+
+  research-synthesis:
+    description: Aggregate research findings into structured output
+    primary_mcp: tavily
+    fallback_chain:
+      - exa
+    evidence_required: false
+    phases:
+      - requirements
+
+  web-scraping:
+    description: Extract structured content from web pages
+    primary_mcp: firecrawl
+    fallback_chain:
+      - fetch
+    evidence_required: false
+    phases:
+      - specification
+
+  semantic-search:
+    description: Neural/semantic web search
+    primary_mcp: exa
+    fallback_chain:
+      - tavily
+    evidence_required: false
+    phases:
+      - requirements
+
+  container-management:
+    description: Docker container lifecycle
+    primary_mcp: docker
+    fallback_chain: []
+    evidence_required: false
+    policy_only: true
+    phases:
+      - release
+
+  cloud-aws:
+    description: AWS resource management
+    primary_mcp: aws
+    fallback_chain: []
+    evidence_required: false
+    policy_only: true
+    phases:
+      - release
+
+  cloud-azure:
+    description: Azure resource management
+    primary_mcp: azure
+    fallback_chain:
+      - aws
+    evidence_required: false
+    policy_only: true
+    phases:
+      - release
+
+  infrastructure-as-code:
+    description: Terraform plan and apply
+    primary_mcp: terraform
+    fallback_chain: []
+    evidence_required: false
+    policy_only: true
+    phases:
+      - release
+
+  container-orchestration:
+    description: Kubernetes cluster operations
+    primary_mcp: kubernetes
+    fallback_chain:
+      - docker
+    evidence_required: false
+    policy_only: true
+    phases:
+      - release
+
+  team-notification:
+    description: Send notifications to team channels
+    primary_mcp: slack
+    fallback_chain: []
+    evidence_required: false
+    policy_only: true
+    phases:
+      - release
+
+  chat-integration:
+    description: Chat platform integration
+    primary_mcp: slack
+    fallback_chain: []
+    evidence_required: false
+    policy_only: true
+
+  documentation-wiki:
+    description: Wiki/documentation platform access
+    primary_mcp: notion
+    fallback_chain: []
+    evidence_required: false
+    policy_only: true
+
+  knowledge-base:
+    description: Company knowledge base access
+    primary_mcp: notion
+    fallback_chain: []
+    evidence_required: false
+    policy_only: true
+
+  project-management:
+    description: Project board and milestone tracking
+    primary_mcp: linear
+    fallback_chain:
+      - jira
+      - github-projects
+    evidence_required: false
+    policy_only: true
+
+  kanban-board:
+    description: Kanban board operations
+    primary_mcp: github-projects
+    fallback_chain:
+      - linear
+    evidence_required: false
+    policy_only: true
+
+  llm-evaluation:
+    description: Evaluate LLM outputs and prompts
+    primary_mcp: promptfoo
+    fallback_chain:
+      - deepeval
+      - ragas
+    evidence_required: false
+    policy_only: true
+    phases:
+      - testing
+
+  prompt-testing:
+    description: Test prompt variations systematically
+    primary_mcp: promptfoo
+    fallback_chain: []
+    evidence_required: false
+    policy_only: true
+
+  metric-testing:
+    description: ML/LLM metric evaluation
+    primary_mcp: deepeval
+    fallback_chain:
+      - ragas
+    evidence_required: false
+    policy_only: true
+
+  rag-evaluation:
+    description: RAG pipeline quality evaluation
+    primary_mcp: ragas
+    fallback_chain:
+      - deepeval
+    evidence_required: false
+    policy_only: true
+
+  static-analysis:
+    description: Code static analysis and linting
+    primary_mcp: semgrep
+    fallback_chain: []
+    evidence_required: false
+    policy_only: true
+    phases:
+      - review
+
+  security-scanning:
+    description: Security vulnerability scanning
+    primary_mcp: semgrep
+    fallback_chain:
+      - gitguardian
+    evidence_required: false
+    policy_only: true
+    phases:
+      - review
+
+  secret-scanning:
+    description: Detect secrets in code
+    primary_mcp: gitguardian
+    fallback_chain:
+      - semgrep
+    evidence_required: false
+    policy_only: true
+    phases:
+      - review
+
+  error-tracking:
+    description: Application error monitoring
+    primary_mcp: sentry
+    fallback_chain: []
+    evidence_required: false
+    policy_only: true
+
+  incident-management:
+    description: Incident triage and response
+    primary_mcp: sentry
+    fallback_chain: []
+    evidence_required: false
+    policy_only: true
+
+  metrics-dashboard:
+    description: Metrics visualization dashboards
+    primary_mcp: grafana
+    fallback_chain:
+      - prometheus
+    evidence_required: false
+    policy_only: true
+
+  monitoring:
+    description: System and application monitoring
+    primary_mcp: prometheus
+    fallback_chain:
+      - grafana
+    evidence_required: false
+    policy_only: true
+
+  metrics-collection:
+    description: Collect and query time-series metrics
+    primary_mcp: prometheus
+    fallback_chain: []
+    evidence_required: false
+    policy_only: true

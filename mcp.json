@@ -1,0 +1,18 @@
+{
+  "version": "1.0.0",
+  "registry": "./mcp/registry.yaml",
+  "capabilities": "./mcp/capabilities.yaml",
+  "mcpServers": {
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    }
+  },
+  "_notes": {
+    "context7": "Available via Cursor context7-plugin — not stdio MCP. See mcp/registry.yaml.",
+    "installed_verification": "Run: python -m mcp_platform validate"
+  }
+}

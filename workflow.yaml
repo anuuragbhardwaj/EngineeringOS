@@ -1,0 +1,598 @@
+# AI Company Software Development Lifecycle
+# Machine-readable workflow definition — mirror of workflow-v1.md
+# Version: 1.1
+
+version: "1.1"
+name: ai-company-sdlc
+description: Canonical 11-phase artifact pipeline for all projects
+authority: workflow-v1.md
+
+defaults:
+  artifact_root: "."  # project root; override in pipeline-status.md if using docs/pipeline/
+  orchestrator:
+    agent: engineering-manager
+    role: Engineering Manager
+  escalation:
+    max_gate_failures: 3
+    action: stop_and_report_to_user
+
+artifacts:
+  orchestration:
+    path: pipeline-status.md
+    owner: engineering-manager
+    required: true
+  phases:
+    - idea.md
+    - requirements.md
+    - spec.md
+    - tasks.md
+    - architecture.md
+    - source_and_tests  # implementation; paths per architecture.md
+    - qa-report.md
+    - review.md
+    - documentation-report.md
+    - release.md
+    - closure.md
+
+phases:
+  - id: idea
+    order: 0
+    name: Idea
+    purpose: Capture and validate the raw opportunity before product work
+    owner:
+      agent: engineering-manager
+      role: Engineering Manager
+    contributors:
+      - user
+    primary_artifact: idea.md
+    inputs:
+      required:
+        - user_intent
+      optional: []
+    outputs:
+      required:
+        - idea.md
+    entry_criteria:
+      - user_or_stakeholder_has_stated_intent
+      - engineering_manager_assigned
+    exit_criteria:
+      - idea_md_exists_with_problem_users_value
+      - decision_is_proceed_to_requirements
+      - no_blocking_feasibility_unknowns_or_user_acknowledged_assumptions
+    gate:
+      id: G0
+      name: Idea Approved
+      approver: user
+      facilitator: engineering-manager
+      pass_when: decision_proceed_and_user_confirms
+    rejection_paths:
+      - condition: idea_too_vague
+        route_to: user
+        action: em_requests_clarification_update_idea_md
+      - condition: not_viable
+        route_to: closure
+        action: decision_reject_write_closure_md
+      - condition: duplicate_work
+        route_to: user
+        action: em_flags_user_confirms_pivot_or_cancel
+    next: requirements
+
+  - id: requirements
+    order: 1
+    name: Requirements
+    purpose: Define product intent — WHAT and WHY
+    owner:
+      agent: senior-product-manager
+      role: Senior Product Manager
+    primary_artifact: requirements.md
+    inputs:
+      required:
+        - idea.md
+      optional: []
+    outputs:
+      required:
+        - requirements.md
+    entry_criteria:
+      - gate_G0_passed
+      - idea_md_decision_proceed
+    exit_criteria:
+      - problem_users_goals_moscow_documented
+      - success_metrics_measurable
+      - open_questions_enumerated
+      - no_technology_or_architecture_in_document
+      - handbook_definition_of_done_phase_1
+    gate:
+      id: G1
+      name: Requirements Approved
+      approver: engineering-manager
+      pass_when: ba_can_start_without_product_clarification
+    rejection_paths:
+      - condition: missing_business_goals
+        route_to: senior-product-manager
+        via: user
+      - condition: ba_cannot_proceed
+        route_to: senior-product-manager
+        action: ba_lists_gaps_pm_revises
+      - condition: scope_creep
+        route_to: user
+        action: em_escalates_reprioritize_moscow
+    next: specification
+
+  - id: specification
+    order: 2
+    name: Specification
+    purpose: Produce engineering-ready testable requirements
+    owner:
+      agent: senior-business-analyst
+      role: Senior Business Analyst
+    primary_artifact: spec.md
+    inputs:
+      required:
+        - requirements.md
+      optional: []
+    outputs:
+      required:
+        - spec.md
+    entry_criteria:
+      - gate_G1_passed
+      - requirements_md_exists
+    exit_criteria:
+      - all_must_have_testable_with_acceptance_criteria
+      - edge_cases_documented
+      - handbook_definition_of_done_phase_2
+    gate:
+      id: G2
+      name: Specification Approved
+      approver: engineering-manager
+      pass_when: planner_can_produce_tasks_without_clarification
+    rejection_paths:
+      - condition: requirements_md_missing
+        route_to: senior-product-manager
+        action: stop
+      - condition: untestable_must_haves
+        route_to: senior-product-manager
+        action: ba_lists_gaps_pm_clarifies
+      - condition: technical_content_in_spec
+        route_to: senior-business-analyst
+        action: remove_defer_to_architecture
+    next: planning
+
+  - id: planning
+    order: 3
+    name: Planning
+    purpose: Decompose spec into phased traceable verifiable tasks
+    owner:
+      agent: senior-software-planner
+      role: Senior Software Planner
+    primary_artifact: tasks.md
+    inputs:
+      required:
+        - spec.md
+      optional:
+        - tasks.md  # refine if exists
+    outputs:
+      required:
+        - tasks.md
+    mcp_evidence:
+      required: true
+      capabilities:
+        - structured-reasoning
+      policy: mcp/evidence-policy.md
+      gate_block: G3
+      pass_when: tasks_md_contains_mcp_evidence_footer
+    entry_criteria:
+      - gate_G2_passed
+      - spec_md_exists
+    exit_criteria:
+      - full_task_dag_all_fr_nfr_traced
+      - each_task_has_acceptance_criteria_and_verify_command
+      - no_final_tech_stack_or_api_design
+      - handbook_definition_of_done_phase_3
+      - mcp_evidence_structured_reasoning_in_tasks_md
+    gate:
+      id: G3
+      name: Plan Approved
+      approver: engineering-manager
+      pass_when: architect_can_design_without_planning_gaps
+    rejection_paths:
+      - condition: spec_md_missing
+        route_to: senior-business-analyst
+        action: stop
+      - condition: untraceable_spec_ids
+        route_to: senior-business-analyst
+        action: planner_lists_ids_ba_updates
+      - condition: tasks_include_architecture
+        route_to: senior-software-planner
+        action: remove_defer_to_architecture_md
+    next: architecture
+
+  - id: architecture
+    order: 4
+    name: Architecture
+    purpose: Define HOW and WHERE — technical design
+    owner:
+      agent: senior-software-architect
+      role: Senior Software Architect
+    primary_artifact: architecture.md
+    inputs:
+      required:
+        - tasks.md
+        - spec.md
+      optional:
+        - existing_codebase
+    outputs:
+      required:
+        - architecture.md
+    mcp_evidence:
+      required: true
+      capabilities:
+        - documentation-lookup
+      policy: mcp/evidence-policy.md
+      gate_block: G4
+      pass_when: architecture_md_contains_mcp_evidence_footer
+    entry_criteria:
+      - gate_G3_passed
+      - tasks_md_and_spec_md_exist
+    exit_criteria:
+      - all_tasks_covered_api_contracts_complete
+      - security_and_data_model_defined
+      - handbook_definition_of_done_phase_4
+      - mcp_evidence_documentation_lookup_in_architecture_md
+    gate:
+      id: G4
+      name: Architecture Approved
+      approver: engineering-manager
+      pass_when: implementers_can_start_without_design_questions
+    rejection_paths:
+      - condition: conflicting_tasks
+        route_to: senior-software-planner
+      - condition: impossible_spec_requirement
+        route_to: senior-business-analyst
+      - condition: design_flaw_found_later
+        route_to: senior-software-architect
+        action: update_architecture_md
+    next: implementation
+
+  - id: implementation
+    order: 5
+    name: Implementation
+    purpose: Build production code and tests per architecture
+    owner:
+      agents:
+        - senior-backend-engineer
+        - senior-frontend-engineer
+      role: Senior Backend / Frontend Engineers
+    primary_artifact: source_and_tests
+    inputs:
+      required:
+        - architecture.md
+        - tasks.md
+        - spec.md
+      optional:
+        - qa-report.md  # on rework
+        - review.md     # on rework
+    outputs:
+      required:
+        - source_code
+        - tests_passing
+      optional:
+        - implementation-notes.md
+    parallel_allowed: true
+    parallel_condition: architecture_md_api_contracts_complete
+    mcp_evidence:
+      required: false
+      advisory: true
+      capabilities:
+        - documentation-lookup
+      policy: mcp/evidence-policy.md
+      gate_block: null
+      pass_when: em_may_request_evidence_on_escalation
+    entry_criteria:
+      - gate_G4_passed
+      - architecture_md_tasks_md_spec_md_exist
+    exit_criteria:
+      - all_assigned_tasks_meet_acceptance_criteria
+      - tests_pass_no_todo_fixme
+      - handbook_coding_standards
+      - handbook_definition_of_done_phase_5
+    gate:
+      id: G5
+      name: Implementation Complete
+      approver: engineering-manager
+      pass_when: qa_can_test_code_complete
+    rejection_paths:
+      - condition: missing_architecture
+        route_to: senior-software-architect
+        action: stop
+      - condition: api_schema_flaw
+        route_to: senior-software-architect
+      - condition: spec_behavior_unclear
+        route_to: senior-business-analyst
+      - condition: qa_or_review_defects
+        route_to: senior-backend-engineer
+        alt_route_to: senior-frontend-engineer
+    next: testing
+
+  - id: testing
+    order: 6
+    name: Testing
+    purpose: Validate behavior against specification
+    owner:
+      agent: senior-qa-engineer
+      role: Senior QA Engineer
+    primary_artifact: qa-report.md
+    inputs:
+      required:
+        - spec.md
+        - tasks.md
+        - architecture.md
+        - source_code
+        - test_suite
+      optional:
+        - qa-report.md  # prior run on re-test
+    outputs:
+      required:
+        - qa-report.md
+    mcp_evidence:
+      required: false
+      capabilities:
+        - browser-automation
+      policy: mcp/evidence-policy.md
+      gate_block: G6
+      pass_when: browser_e2e_claimed_implies_evidence_or_fallback_documented
+    entry_criteria:
+      - gate_G5_passed
+      - implementation_code_complete
+    exit_criteria:
+      - verdict_pass
+      - no_open_critical_high_defects
+      - all_must_have_fr_tested_with_evidence
+      - handbook_definition_of_done_phase_6
+    gate:
+      id: G6
+      name: QA Passed
+      approver: engineering-manager
+      pass_when: qa_report_verdict_pass
+    skippable: false  # unless user documents risk in pipeline-status.md
+    rejection_paths:
+      - condition: implementation_incomplete
+        route_to: implementation
+      - condition: defects_found
+        route_to: implementation
+        routing_table: handbook_testing_standards_defect_routing
+      - condition: spec_gap
+        route_to: senior-business-analyst
+      - condition: verdict_fail
+        route_to: implementation
+        action: loop_until_pass_or_escalate
+    next: review
+
+  - id: review
+    order: 7
+    name: Review
+    purpose: Assess code quality and architecture compliance
+    owner:
+      agent: senior-code-reviewer
+      role: Senior Code Reviewer
+    primary_artifact: review.md
+    inputs:
+      required:
+        - architecture.md
+        - spec.md
+        - source_code
+        - test_results
+        - qa-report.md
+    outputs:
+      required:
+        - review.md
+    entry_criteria:
+      - gate_G6_passed
+      - qa_report_verdict_pass
+    exit_criteria:
+      - status_approved
+      - no_open_critical_high_findings
+      - handbook_definition_of_done_phase_7
+    gate:
+      id: G7
+      name: Review Approved
+      approver: engineering-manager
+      pass_when: review_md_status_approved
+    skippable: false  # unless user documents risk in pipeline-status.md
+    rejection_paths:
+      - condition: qa_not_passed
+        route_to: testing
+      - condition: changes_requested
+        route_to: implementation
+        routing_table: handbook_review_checklist_finding_assignment
+      - condition: architecture_drift
+        route_to: senior-software-architect
+    next: documentation
+
+  - id: documentation
+    order: 8
+    name: Documentation
+    purpose: Generate accurate traceable project documentation from artifacts and source
+    owner:
+      agent: documentation-engineer
+      role: Documentation Engineer
+    primary_artifact: documentation-report.md
+    inputs:
+      required:
+        - review.md
+        - qa-report.md
+        - architecture.md
+        - spec.md
+        - tasks.md
+        - requirements.md
+        - idea.md
+        - pipeline-status.md
+      optional:
+        - release.md
+        - source_code
+        - git_history
+    outputs:
+      required:
+        - documentation-report.md
+        - readme_md
+      optional:
+        - changelog_md
+        - architecture_doc
+        - api_md
+        - contributing_md
+        - installation_md
+        - usage_md
+        - docs_directory
+    mcp_evidence:
+      required: false
+      capabilities:
+        - documentation-lookup
+      policy: mcp/evidence-policy.md
+      gate_block: G8
+      pass_when: documentation_lookup_used_for_library_claims_or_fallback_documented
+    entry_criteria:
+      - gate_G7_passed
+      - review_md_approved
+      - qa_report_verdict_pass
+    exit_criteria:
+      - documentation_report_verdict_pass
+      - traceability_matrix_complete
+      - handbook_documentation_standards_satisfied
+      - validation_checklist_complete_per_docs_documentation_validation
+      - handbook_definition_of_done_phase_8
+    gate:
+      id: G8
+      name: Documentation Approved
+      approver: engineering-manager
+      pass_when: documentation_report_pass_and_em_validates_accuracy
+    skippable: true
+    skip_condition: design_only_project_with_em_documented_exemption_in_pipeline_status
+    rejection_paths:
+      - condition: review_not_approved
+        route_to: review
+      - condition: docs_contradict_artifacts
+        route_to: documentation-engineer
+        action: regenerate_from_source
+      - condition: invented_content
+        route_to: documentation-engineer
+        action: remove_or_trace_claims
+      - condition: implementation_changed
+        route_to: implementation
+        alt_route_to: review
+    next: release
+
+  - id: release
+    order: 9
+    name: Release
+    purpose: Ship feature to target environment with documented steps
+    owner:
+      agent: engineering-manager
+      role: Engineering Manager
+    contributors:
+      - senior-backend-engineer
+      - senior-frontend-engineer
+    primary_artifact: release.md
+    inputs:
+      required:
+        - review.md
+        - qa-report.md
+        - architecture.md
+      optional:
+        - deployment_scripts
+    outputs:
+      required:
+        - release.md
+    entry_criteria:
+      - gate_G8_passed
+      - documentation_report_pass_or_em_documented_skip
+      - review_md_approved
+      - qa_report_pass_still_valid
+      - deployment_approach_in_architecture_md
+    exit_criteria:
+      - release_md_complete_with_deploy_and_rollback
+      - post_deploy_verification_executed_or_user_accepts
+      - application_in_target_environment_or_user_confirms
+    gate:
+      id: G9
+      name: Released
+      approver: user
+      facilitator: engineering-manager
+      pass_when: user_confirms_release_criteria_met
+    rejection_paths:
+      - condition: review_not_approved
+        route_to: review
+      - condition: deploy_failure
+        route_to: implementation
+      - condition: missing_deploy_design
+        route_to: senior-software-architect
+      - condition: user_blocks_release
+        route_to: hold
+        action: document_in_pipeline_status
+    next: closure
+
+  - id: closure
+    order: 10
+    name: Closure
+    purpose: Close initiative, capture learnings, archive artifacts
+    owner:
+      agent: engineering-manager
+      role: Engineering Manager
+    primary_artifact: closure.md
+    inputs:
+      required:
+        - release.md
+        - all_pipeline_artifacts
+      optional: []
+    outputs:
+      required:
+        - closure.md
+      updates:
+        - pipeline-status.md  # status = closed
+    entry_criteria:
+      - gate_G9_passed
+      - release_md_exists
+    exit_criteria:
+      - success_metrics_compared_to_requirements
+      - all_artifacts_archived_listed
+      - pipeline_status_marked_closed
+      - retrospective_recorded
+    gate:
+      id: G10
+      name: Closed
+      approver: user
+      facilitator: engineering-manager
+      pass_when: user_confirms_closure
+    rejection_paths:
+      - condition: release_not_complete
+        route_to: release
+      - condition: critical_post_release_defect
+        route_to: testing
+        alt_route_to: implementation
+        decision_by: engineering-manager
+      - condition: early_cancel_from_idea
+        route_to: closure
+        action: abbreviated_closure_md
+    next: null  # terminal
+
+rework_routing:
+  vague_idea: { phase: idea, owner: engineering-manager }
+  product_scope: { phase: requirements, owner: senior-product-manager }
+  acceptance_criteria: { phase: specification, owner: senior-business-analyst }
+  plan_gaps: { phase: planning, owner: senior-software-planner }
+  design_flaw: { phase: architecture, owner: senior-software-architect }
+  backend_bug: { phase: implementation, owner: senior-backend-engineer }
+  frontend_bug: { phase: implementation, owner: senior-frontend-engineer }
+  behavioral_failure: { phase: testing, owner: senior-qa-engineer }
+  code_quality: { phase: review, owner: senior-code-reviewer }
+  documentation_gap: { phase: documentation, owner: documentation-engineer }
+  deploy_failure: { phase: release, owner: engineering-manager }
+
+handbook_references:
+  - handbook/company-handbook.md
+  - handbook/engineering-standards.md
+  - handbook/definition-of-done.md
+  - handbook/documentation-standards.md
+  - handbook/coding-standards.md
+  - handbook/testing-standards.md
+  - handbook/review-checklist.md
+  - handbook/communication-guidelines.md
+  - workflow-v1.md
