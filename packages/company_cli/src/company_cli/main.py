@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import company_cli.runtime_bootstrap  # noqa: F401 — wire Runtime factory before API use
 import typer
 from rich.console import Console
 

@@ -23,7 +23,6 @@ class PipelineExecutor:
         lifecycle: LifecycleCallbacks,
     ) -> Any:
         from runtime_engine.errors import AdapterInvocationError
-        from runtime_engine.types import PhaseStatus
 
         stop_phase = workflow.phase_by_id(stop_after_phase)
         if stop_phase is None:
@@ -43,6 +42,7 @@ class PipelineExecutor:
                 state = self._phases.execute(
                     state,
                     workflow,
+                    lifecycle=lifecycle,
                     publish_event=lifecycle.publish_event,
                 )
             except ApprovalRequiredError:
@@ -77,10 +77,8 @@ class PipelineExecutor:
             )
 
             if phase.id == stop_after_phase:
-                state.execution.pipeline_completed = True
-                state.execution.pipeline_stop_phase = stop_after_phase
-                state.phase_status[phase.id] = PhaseStatus.PASS
-                lifecycle.persist(state)
+                lifecycle.mutator.complete_planning_pipeline(stop_after_phase, phase.id)
+                lifecycle.persist(lifecycle.mutator.state)
                 lifecycle.publish_event(
                     "PipelineCompleted",
                     {"stop_phase": stop_after_phase},

@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, Any
 
 from orchestrator.types import LifecycleCallbacks
 
+from runtime_engine.state.mutator import PipelineStateMutator
+
 if TYPE_CHECKING:
     from runtime_engine.runtime.facade import Runtime
 
@@ -17,13 +19,21 @@ class RuntimeLifecycleBridge(LifecycleCallbacks):
         self._runtime = runtime
         self._project_id = project_id
         self._state: Any = None
+        self._mutator: PipelineStateMutator | None = None
 
     def bind(self, state: Any) -> None:
         self._state = state
+        self._mutator = PipelineStateMutator(state)
 
     @property
     def state(self) -> Any:
         return self._state
+
+    @property
+    def mutator(self) -> PipelineStateMutator:
+        if self._mutator is None:
+            raise RuntimeError("Lifecycle bridge not bound to state")
+        return self._mutator
 
     def persist(self, state: Any) -> None:
         self._state = state

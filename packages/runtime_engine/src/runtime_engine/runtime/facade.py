@@ -307,15 +307,23 @@ class Runtime:
         state = self.load_project(project_id)
         return self._registry.resolve_orchestrator(self._workflow)
 
+    def list_project_ids(self) -> list[str]:
+        return self._store.list_projects()
+
+    def project_exists(self, project_id: str) -> bool:
+        return self._store.exists(project_id)
+
     def invoke_agent(self, project_id: str) -> AdapterResult:
+        from runtime_engine.lifecycle import RuntimeLifecycleBridge
+
         state = self.load_project(project_id)
         orchestrator_desc = self._registry.resolve_orchestrator(self._workflow)
 
-        def publish(event_type: str, payload: dict) -> None:
-            self._bus.publish(self._bus.make_event(event_type, project_id, payload))
+        lifecycle = RuntimeLifecycleBridge(self, project_id)
+        lifecycle.bind(state)
 
         state = self._orchestrator.execute_phase(
-            state, self._workflow, publish_event=publish
+            state, self._workflow, lifecycle=lifecycle
         )
         self._persist(project_id, state)
 

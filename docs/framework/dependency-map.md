@@ -83,13 +83,12 @@ flowchart BT
     CC --> PE
     CC --> AC
     CC --> MP
-    CC --> RT
     RT --> OR
     OR --> AI
     OR --> PE
 ```
 
-**Note:** `CC --> RT` is a documented monorepo coupling via `ProjectAPI`.
+Runtime is wired at the CLI composition root via `company_cli/runtime_bootstrap.py` → `company_core.runtime_bridge.configure_runtime_factory()`. `company_core` depends on `IRuntimePort` only.
 
 ---
 
@@ -105,8 +104,6 @@ flowchart BT
 | `handbook/` | Any code |
 | Kernel plugins | Other plugins' internals |
 | Framework plugins | Kernel engine internals (use events only) |
-
-**Documented exception:** `company_core` imports `runtime_engine` via `ProjectAPI` — violates original L2 purity rule; accepted for monorepo v1. See [technical-debt.md](../audit/technical-debt.md).
 
 ---
 

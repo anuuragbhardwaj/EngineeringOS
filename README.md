@@ -191,14 +191,14 @@ engineeringos/
 
 ### Checkpoint limitations
 
-- Orchestrator checkpoints and approval hooks are **partially ephemeral** (in-memory). Process restart may lose checkpoint state not mirrored in Runtime `PipelineState` or `.company/` session files.
+- Orchestrator checkpoints persist under `.company/checkpoints/orchestrator/` (schema `1.0.0`). Runtime `PipelineState` remains authoritative for pipeline phase/gate state.
 - Parallel execution checkpoint recovery depends on platform availability at recover time.
 
 ### Production readiness
 
-- **128 tests** cover core platforms; `mcp_platform` has limited dedicated test coverage.
+- **142 tests** cover core platforms including kernel hardening and MCP health checks.
 - Policy fields such as `timeout_seconds` and `mcp_evidence_required` are resolved but **not enforced** in all paths.
-- `AgentInvocationFailed` kernel event is specified but **not emitted** on all adapter failures.
+- `AgentInvocationFailed` is emitted on orchestrator adapter failure; Runtime direct `invoke_agent` path may not publish on all internal exceptions (SDLC execution uses orchestrator).
 
 ### Installation assumptions
 
@@ -208,17 +208,17 @@ engineeringos/
 
 ### Architectural debt
 
-Published openly in [docs/audit/](./docs/audit/):
+Published openly in [docs/audit/](./docs/audit/). Kernel hardening (2026-07-02) resolved the highest-severity items:
 
-| Issue | Severity |
-|-------|----------|
-| `company_core → runtime_engine` dependency | Documented violation |
-| Orchestrator mutates `PipelineState` without Runtime-owned mutation port | High |
-| Four `discover_framework_root` heuristics across packages | Medium — **consolidated** to `company_core.config.loader.discover_framework_root_from_path` |
-| `mcp_platform` at repo root vs `packages/` convention | Medium |
-| ~~Dead code: `em_runner.py`, `runtime_engine/adapters/scaffold.py`~~ | **Removed** (2026-07-02 cleanup) |
+| Issue | Severity | Status |
+|-------|----------|--------|
+| ~~`company_core → runtime_engine` dependency~~ | High | **Resolved** — `IRuntimePort` + `runtime_bridge` |
+| ~~Orchestrator mutates `PipelineState` without Runtime-owned mutation port~~ | High | **Resolved** — `PipelineStateMutator` |
+| Four `discover_framework_root` heuristics across packages | Medium | **Consolidated** to `company_core.config.loader.discover_framework_root_from_path` |
+| `mcp_platform` at repo root vs `packages/` convention | Medium | Open |
+| ~~Dead code: `em_runner.py`, `runtime_engine/adapters/scaffold.py`~~ | Low | **Removed** (2026-07-02 cleanup) |
 
-See [docs/audit/technical-debt.md](./docs/audit/technical-debt.md) and [docs/audit/architecture-compliance.md](./docs/audit/architecture-compliance.md).
+See [docs/kernel-hardening/](./docs/kernel-hardening/) for hardening deliverables.
 
 ---
 

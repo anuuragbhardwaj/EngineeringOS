@@ -77,6 +77,7 @@ class LifecycleCallbacks:
     record_gate: Callable[[str, bool, str], None]
     advance: Callable[[], Any]
     publish_event: Callable[[str, dict], None]
+    mutator: Any
     is_approved: Callable[[str], bool] | None = None
 
 

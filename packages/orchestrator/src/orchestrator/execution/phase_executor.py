@@ -15,7 +15,7 @@ from orchestrator.history.recorder import HistoryRecorder
 from orchestrator.policy.engine import PolicyEngine
 from orchestrator.prompt_builder.builder import PromptBuilder
 from orchestrator.scheduler.scheduler import ExecutionScheduler
-from orchestrator.types import ExecutionPolicy, IAgentAdapter
+from orchestrator.types import ExecutionPolicy, IAgentAdapter, LifecycleCallbacks
 
 
 class PhaseExecutor:
@@ -56,16 +56,18 @@ class PhaseExecutor:
         state: Any,
         workflow: Any,
         *,
+        lifecycle: LifecycleCallbacks | None = None,
         publish_event: callable | None = None,
     ) -> Any:
+        from runtime_engine.state.mutator import PipelineStateMutator
         from runtime_engine.types import (
             AdapterStatus,
             ArtifactRecord,
             ArtifactRef,
             InvocationContext,
-            PhaseStatus,
-            ProjectStatus,
         )
+
+        mutator = lifecycle.mutator if lifecycle else PipelineStateMutator(state)
 
         phase_id = state.current_phase_id
         phase = workflow.phase_by_id(phase_id)
@@ -90,7 +92,7 @@ class PhaseExecutor:
                     {"reason": "approval_required", "gate_id": phase.gate.id},
                 )
                 self._checkpoints.pause(checkpoint.checkpoint_id)
-                state.status = ProjectStatus.PAUSED
+                mutator.set_project_paused()
                 if publish_event:
                     publish_event("PipelinePaused", {"phase_id": phase_id, "gate_id": phase.gate.id})
                 raise ApprovalRequiredError(f"Approval required for gate {phase.gate.id}")
@@ -99,10 +101,7 @@ class PhaseExecutor:
             state.project_id, phase_id, specialist.agent_id
         )
 
-        state.phase_status[phase_id] = PhaseStatus.IN_PROGRESS
-        state.execution.active_agent_id = orchestrator_desc.agent_id
-        state.execution.last_invocation_at = datetime.utcnow()
-        state.execution.invocation_count += 1
+        mutator.begin_phase_execution(phase_id, orchestrator_desc.agent_id)
 
         if publish_event:
             publish_event(
@@ -130,6 +129,7 @@ class PhaseExecutor:
         if not policy.sequential and self._parallel:
             self._execute_parallel(
                 state=state,
+                mutator=mutator,
                 workflow=workflow,
                 phase=phase,
                 orchestrator_desc=orchestrator_desc,
@@ -143,6 +143,7 @@ class PhaseExecutor:
                 for artifact_name in plan.deliverables:
                     self._execute_artifact(
                         state=state,
+                        mutator=mutator,
                         workflow=workflow,
                         phase=phase,
                         orchestrator_desc=orchestrator_desc,
@@ -158,6 +159,7 @@ class PhaseExecutor:
         if workflow.artifacts.orchestration.required:
             self._execute_artifact(
                 state=state,
+                mutator=mutator,
                 workflow=workflow,
                 phase=phase,
                 orchestrator_desc=orchestrator_desc,
@@ -172,13 +174,14 @@ class PhaseExecutor:
             )
 
         self._checkpoints.complete(checkpoint.checkpoint_id)
-        state.updated_at = datetime.utcnow()
-        return state
+        mutator.touch_updated_at()
+        return mutator.state
 
     def _execute_parallel(
         self,
         *,
         state: Any,
+        mutator: Any,
         workflow: Any,
         phase: Any,
         orchestrator_desc: Any,
@@ -202,6 +205,7 @@ class PhaseExecutor:
         def invoke_worker(*, specialist, employee_id, deliverable, worker_id, **kwargs):
             self._execute_artifact(
                 state=state,
+                mutator=mutator,
                 workflow=workflow,
                 phase=phase,
                 orchestrator_desc=orchestrator_desc,
@@ -224,7 +228,7 @@ class PhaseExecutor:
 
         for worker in plan.workers:
             status = PhaseStatus.PASS if worker.status == "completed" else PhaseStatus.FAIL
-            state.execution.parallel_tracks.append(
+            mutator.append_parallel_track(
                 ParallelTrack(
                     track_id=worker.worker_id,
                     agent_id=worker.employee_id,
@@ -238,6 +242,7 @@ class PhaseExecutor:
         self,
         *,
         state: Any,
+        mutator: Any,
         workflow: Any,
         phase: Any,
         orchestrator_desc: Any,
@@ -250,6 +255,7 @@ class PhaseExecutor:
         plan_template: str,
         orchestration_path: str | None = None,
     ) -> None:
+        from runtime_engine.events import catalog as events
         from runtime_engine.types import ArtifactRecord, ArtifactRef, InvocationContext
 
         phase_id = state.current_phase_id
@@ -334,13 +340,28 @@ class PhaseExecutor:
         duration_ms = (time.perf_counter() - start) * 1000
         rel_path = orchestration_path or artifact_name
 
-        state.artifact_index[artifact_name] = ArtifactRecord(
-            name=artifact_name,
-            path=rel_path,
-            owner_agent=specialist.agent_id,
-            last_validated_at=None,
-            approved=False,
+        mutator.record_artifact(
+            artifact_name,
+            ArtifactRecord(
+                name=artifact_name,
+                path=rel_path,
+                owner_agent=specialist.agent_id,
+                last_validated_at=None,
+                approved=False,
+            ),
         )
+
+        if result.status.value == "failed" and publish_event:
+            publish_event(
+                events.AgentInvocationFailed,
+                {
+                    "project_id": state.project_id,
+                    "agent_id": specialist.agent_id,
+                    "phase_id": phase_id,
+                    "error": result.message or "adapter invocation failed",
+                    "artifact": artifact_name,
+                },
+            )
 
         if publish_event:
             publish_event(
@@ -353,7 +374,7 @@ class PhaseExecutor:
                 },
             )
 
-        state.execution.history.append(
+        mutator.append_execution_history(
             {
                 "timestamp": datetime.utcnow().isoformat(),
                 "orchestrator": orchestrator_desc.agent_id,

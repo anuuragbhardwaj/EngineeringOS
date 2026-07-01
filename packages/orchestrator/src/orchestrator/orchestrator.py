@@ -36,7 +36,7 @@ class Orchestrator:
         self._context = ContextEngine()
         self._prompts = PromptBuilder(framework_root)
         self._policies = PolicyEngine(policies_path)
-        self._checkpoints = CheckpointManager()
+        self._checkpoints = CheckpointManager(instance_root=instance_root)
         self._conversations = ConversationRouter()
         self._history = HistoryRecorder()
         self._approval = ApprovalHooks()
@@ -64,9 +64,14 @@ class Orchestrator:
         state: Any,
         workflow: Any,
         *,
+        lifecycle: LifecycleCallbacks | None = None,
         publish_event: callable | None = None,
     ) -> Any:
-        return self._phase_executor.execute(state, workflow, publish_event=publish_event)
+        if lifecycle is not None:
+            publish_event = publish_event or lifecycle.publish_event
+        return self._phase_executor.execute(
+            state, workflow, lifecycle=lifecycle, publish_event=publish_event
+        )
 
     def execute_planning_pipeline(
         self,

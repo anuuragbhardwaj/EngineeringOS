@@ -6,13 +6,12 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from runtime_engine.factory import create_runtime
-from runtime_engine.runtime.facade import Runtime
-
 from company_core.config.loader import discover_framework_root, discover_instance_root
 from company_core.models.common import Project, ProjectInfo
 from company_core.models.errors import ManifestNotFoundError, ProjectNotFoundError
 from company_core.models.manifest import CompanyManifest
+from company_core.ports.runtime_port import IRuntimePort
+from company_core.runtime_bridge import create_runtime
 from company_lifecycle.factory import create_lifecycle_platform
 from company_lifecycle.types import ProjectCreateOptions
 from workspace_execution.factory import create_execution_platform
@@ -41,11 +40,11 @@ class ProjectAPI:
 
     def __init__(self, manifest: CompanyManifest | None = None) -> None:
         self._manifest = manifest
-        self._runtime: Runtime | None = None
+        self._runtime: IRuntimePort | None = None
         self._lifecycle = create_lifecycle_platform()
         self._execution = create_execution_platform()
 
-    def _get_runtime(self) -> Runtime:
+    def _get_runtime(self) -> IRuntimePort:
         if self._runtime is None:
             instance = discover_instance_root()
             framework = discover_framework_root(instance)
@@ -103,7 +102,7 @@ class ProjectAPI:
         if instance is None:
             runtime = self._get_runtime()
             projects: list[ProjectInfo] = []
-            for pid in runtime._store.list_projects():  # noqa: SLF001
+            for pid in runtime.list_project_ids():
                 try:
                     view = runtime.status(pid)
                     projects.append(ProjectInfo(project_id=pid, status=view.status.value))
@@ -139,12 +138,12 @@ class ProjectAPI:
             raise ManifestNotFoundError("company.yaml not found")
         self._lifecycle.remove_project(project_id, workspace_id, instance)
 
-    def get_runtime(self, project_id: str | None = None) -> Runtime:
+    def get_runtime(self, project_id: str | None = None) -> IRuntimePort:
         pid = project_id or self._active_project_id()
         if not pid:
             raise ProjectNotFoundError("No active project")
         runtime = self._get_runtime()
-        if not runtime._store.exists(pid):  # noqa: SLF001
+        if not runtime.project_exists(pid):
             raise ProjectNotFoundError(f"Project not found: {pid}")
         instance = discover_instance_root()
         if instance:
