@@ -1,0 +1,61 @@
+.hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 16px;
+  gap: 16px;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 180px;
+}
+
+.title {
+  color: var(--eos-accent);
+  font-size: 10px;
+}
+
+.stats {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.right {
+  display: flex;
+  gap: 16px;
+  min-width: 120px;
+  justify-content: flex-end;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.statLabel {
+  font-size: 10px;
+  color: var(--eos-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statValue {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.accent {
+  color: var(--eos-success);
+}
